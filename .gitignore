@@ -55,3 +55,12 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Python files
+*.pyc
+
+# Idea files
+.idea/*
+*.iml
+*.ipr
+*.iws
