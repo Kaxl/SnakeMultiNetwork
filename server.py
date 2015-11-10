@@ -17,9 +17,9 @@ class Server:
         self.clients = {}
         self.outputs = []
         self.server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.server.bind(('', port))
+        self.server.bind(('127.0.0.1', port))
         print 'Listening to port', port, '...'
-        self.server.listen(MAX_CLIENT)
+        self.server.listen(10)
         # Trap keyboard interrupts
         signal.signal(signal.SIGINT, self.sighandler)
 
@@ -67,6 +67,10 @@ class Server:
 
                     except socket.timeout:
                         print 'Error timeout'
+
+if __name__ == "__main__":
+    s = Server()
+    s.waitConnections()
 
 
 # TODO

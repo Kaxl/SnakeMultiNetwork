@@ -77,6 +77,10 @@ class Client:
     def close(self):
         return
 
+if __name__ == "__main__":
+    c = Client()
+
+
 # class SnakeChannel
 
 # class Token:
