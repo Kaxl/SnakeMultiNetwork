@@ -11,15 +11,21 @@ import signal
 from snake_channel import SnakeChannel
 
 MAX_CLIENT = 10
+UDP_IP = "127.0.0.1"
+UDP_PORT = 5005
+BUF_SIZE = 4096
 
 class Server:
-    def __init__(self, port=1234):
+    def __init__(self, ip=UDP_IP, port=UDP_PORT):
         self.clients = {}
         self.outputs = []
         self.server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.server.bind(('127.0.0.1', port))
+        self.ip = ip
+        self.port = port
+        self.server.bind((ip, port))
+        # self.server.listen(10)
         print 'Listening to port', port, '...'
-        self.server.listen(10)
+
         # Trap keyboard interrupts
         signal.signal(signal.SIGINT, self.sighandler)
 
@@ -30,6 +36,38 @@ class Server:
         # 3. Wait for <<Connect /nom_cle/val_cle/.../...>>
         # 4. Send <<Connected B>>
         while True:
+
+            try:
+                # 1. Wait for <<GetToken A Snake>>
+                data_token, addr = self.server.recv(BUF_SIZE)
+                print "IN   - ", data_token
+
+                token = data_token.split()
+                A = token[1]
+                # TODO Check if A already used
+                B = random.randint(0, (1 << 32) - 1)
+                # 2. Send <<Token B A ProtocoleNumber>>
+                self.server.sendto("Token " + str(B) + " " + str(A) + " " + SnakeChannel.protocol, (addr, self.port))
+                print "OUT   - Token ", B, " ", A, " ", SnakeChannel.protocol
+
+                # 3. Wait for <<Connect /nom_cle/val_cle/.../...>>
+                data_connect, addr = self.server.recv(4096)
+                print "IN   - ", data_connect
+
+                token = data_connect.split()
+                param = token[1].split('/')
+
+                # Check the B value
+                if B != param[2]:
+                    continue
+
+                # 4. Send <<Connected B>>
+                self.server.sendto("Connected " + str(B),  (addr, self.port))
+                print "OUT   - Connected ", B
+            except socket.timeout:
+                print 'Error timeout'
+
+            """
             inputready, outputready, exceptready = select.select(input, [], [])
 
             for s in inputready:
@@ -67,6 +105,7 @@ class Server:
 
                     except socket.timeout:
                         print 'Error timeout'
+            """
 
 if __name__ == "__main__":
     s = Server()
