@@ -25,43 +25,50 @@ class Client:
         state = 0
         A = random.randint(0, (1 << 32) - 1)
         while state < 4:
-            #
-            if state == 0:
-                self.sock.connect((self.host, self.port))
-                print 'Connect'
-                # 1. Send <<GetToken A Snake>>
-                self.sock.send("GetToken " + str(A) + " Snake")
-                print "OUT   - GetToken ", A, " Snake"
-                state += 1
-            elif state == 1:
-                # 2. Wait for <<Token B A ProtocoleNumber>>
-                ack_token = self.sock.recv(4096)
-                print "IN   - ", ack_token
-                if ack_token is None:
-                    state = 0
-                else:
+            try:
+                if state == 0:
+                    self.sock.connect((self.host, self.port))
+                    print 'Connect'
+                    # 1. Send <<GetToken A Snake>>
+                    self.sock.send("GetToken " + str(A) + " Snake")
+                    print "OUT   - GetToken ", A, " Snake"
                     state += 1
-            elif state == 2:
-                token = ack_token.split()
-                # Check if A value is correct
-                if token[2] != A:
-                    state = 0
+                elif state == 1:
+                    # 2. Wait for <<Token B A ProtocoleNumber>>
+                    ack_token = self.sock.recv(4096)
+                    print "IN   - ", ack_token
+                    if ack_token is None:
+                        state = 0
+                    else:
+                        state += 1
+                elif state == 2:
+                    token = ack_token.split()
+                    print token
+                    print token[2]
+                    print A
+                    # Check if A value is correct
+                    if token[2] != A:   # WTF comparaison ???
+                        print "state 0"
+                        state = 0
+                    else:
+                        B, proto_number = token[1], token[3]
+                        self.sock.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number))
+                        print "OUT   - Connect /challenge/", B, "/protocol/", proto_number
+                        state += 1
+                elif state == 3:
+                    ack_connect = self.sock.recv(4096)
+                    print "IN   - ", ack_connect
+                    if ack_connect is None:
+                        state = 2
+                    else:
+                        token = ack_connect.split()
+                        B = token[1]
+                        state += 1
                 else:
-                    B, proto_number = token[1], token[3]
-                    self.sock.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number))
-                    print "OUT   - Connect /challenge/", B, "/protocol/", proto_number
-                    state += 1
-            elif state == 3:
-                ack_connect = self.sock.recv(4096)
-                print "IN   - ", ack_connect
-                if ack_connect is None:
-                    state = 2
-                else:
-                    token = ack_connect.split()
-                    B = token[1]
-                    state += 1
-            else:
-                print "Error during connection of client."
+                    print "Error during connection of client."
+            except socket.timeout:
+                # If timeout, return to state 0
+                state = 0
 
         return
 

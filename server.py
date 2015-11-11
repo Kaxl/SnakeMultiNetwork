@@ -38,6 +38,7 @@ class Server:
         while True:
 
             try:
+                print "Wait for user"
                 # 1. Wait for <<GetToken A Snake>>
                 data_token, addr = self.server.recvfrom(BUF_SIZE)
                 print "IN   - ", data_token
@@ -47,18 +48,20 @@ class Server:
                 # TODO Check if A already used
                 B = random.randint(0, (1 << 32) - 1)
                 # 2. Send <<Token B A ProtocoleNumber>>
-                self.server.sendto("Token " + str(B) + " " + str(A) + " " + str(SnakeChannel.protocol), (addr, self.port))
+                print "addr : ", addr
+                self.server.sendto("Token " + str(B) + " " + str(A) + " " + str(SnakeChannel.protocol), addr)
                 print "OUT   - Token ", B, " ", A, " ", SnakeChannel.protocol
 
                 # 3. Wait for <<Connect /nom_cle/val_cle/.../...>>
-                data_connect, addr = self.server.recv(4096)
+                data_connect, addr = self.server.recvfrom(4096)
                 print "IN   - ", data_connect
 
                 token = data_connect.split()
                 param = token[1].split('/')
 
                 # Check the B value
-                if B != param[2]:
+                if len(param) < 3 or B != param[2]:
+                    print "next"
                     continue
 
                 # 4. Send <<Connected B>>
@@ -67,7 +70,6 @@ class Server:
             except socket.timeout:
                 print 'Error timeout'
 
-            """
             inputready, outputready, exceptready = select.select(input, [], [])
 
             for s in inputready:
@@ -105,7 +107,6 @@ class Server:
 
                     except socket.timeout:
                         print 'Error timeout'
-            """
 
 if __name__ == "__main__":
     s = Server()
