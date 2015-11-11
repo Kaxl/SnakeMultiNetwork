@@ -60,16 +60,16 @@ class Server:
                 param = token[1].split('/')
 
                 # Check the B value
-                if len(param) < 3 or B != param[2]:
+                if len(param) < 3 or int(B) != int(param[2]):
                     print "next"
                     continue
 
                 # 4. Send <<Connected B>>
-                self.server.sendto("Connected " + str(B),  (addr, self.port))
+                self.server.sendto("Connected " + str(B),  addr)
                 print "OUT   - Connected ", B
             except socket.timeout:
                 print 'Error timeout'
-
+"""
             inputready, outputready, exceptready = select.select(input, [], [])
 
             for s in inputready:
@@ -107,6 +107,7 @@ class Server:
 
                     except socket.timeout:
                         print 'Error timeout'
+"""
 
 if __name__ == "__main__":
     s = Server()

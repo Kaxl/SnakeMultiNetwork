@@ -47,7 +47,7 @@ class Client:
                     print token[2]
                     print A
                     # Check if A value is correct
-                    if token[2] != A:   # WTF comparaison ???
+                    if int(token[2]) != int(A):   # WTF comparaison ???
                         print "state 0"
                         state = 0
                     else:
