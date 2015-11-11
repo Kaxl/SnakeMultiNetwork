@@ -43,9 +43,6 @@ class Client:
                         state += 1
                 elif state == 2:
                     token = ack_token.split()
-                    print token
-                    print token[2]
-                    print A
                     # Check if A value is correct
                     if int(token[2]) != int(A):   # WTF comparaison ???
                         print "state 0"
@@ -53,7 +50,7 @@ class Client:
                     else:
                         B, proto_number = token[1], token[3]
                         self.sock.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number))
-                        print "OUT   - Connect /challenge/", B, "/protocol/", proto_number
+                        print "OUT  - Connect /challenge/", B, "/protocol/", proto_number
                         state += 1
                 elif state == 3:
                     ack_connect = self.sock.recv(4096)

@@ -36,7 +36,6 @@ class Server:
         # 3. Wait for <<Connect /nom_cle/val_cle/.../...>>
         # 4. Send <<Connected B>>
         while True:
-
             try:
                 print "Wait for user"
                 # 1. Wait for <<GetToken A Snake>>
@@ -48,9 +47,8 @@ class Server:
                 # TODO Check if A already used
                 B = random.randint(0, (1 << 32) - 1)
                 # 2. Send <<Token B A ProtocoleNumber>>
-                print "addr : ", addr
                 self.server.sendto("Token " + str(B) + " " + str(A) + " " + str(SnakeChannel.protocol), addr)
-                print "OUT   - Token ", B, " ", A, " ", SnakeChannel.protocol
+                print "OUT  - Token ", B, " ", A, " ", SnakeChannel.protocol
 
                 # 3. Wait for <<Connect /nom_cle/val_cle/.../...>>
                 data_connect, addr = self.server.recvfrom(4096)
@@ -66,7 +64,7 @@ class Server:
 
                 # 4. Send <<Connected B>>
                 self.server.sendto("Connected " + str(B),  addr)
-                print "OUT   - Connected ", B
+                print "OUT  - Connected ", B
             except socket.timeout:
                 print 'Error timeout'
 """
