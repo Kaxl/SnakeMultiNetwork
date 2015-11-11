@@ -4,9 +4,12 @@
 import socket  # Import socket module
 import random
 
+from constants import *
+
 from snake_channel import SnakeChannel
 
-class Client:
+
+class Client(SnakeChannel):
 
     def __init__(self, host='127.0.0.1', port=5005):
         self.host = host
@@ -22,6 +25,7 @@ class Client:
         # 2. Wait for <<Token B A ProtocoleNumber>>
         # 3. Send <<Connect /nom_cle/val_cle/.../...>>
         # 4. Wait for <<Connected B>>
+        seq_number = 0xFFFFFFFF
         state = 0
         A = random.randint(0, (1 << 32) - 1)
         while state < 4:
@@ -30,7 +34,8 @@ class Client:
                     self.sock.connect((self.host, self.port))
                     print 'Connect'
                     # 1. Send <<GetToken A Snake>>
-                    self.sock.send("GetToken " + str(A) + " Snake")
+                    self.send("GetToken " + str(A) + " Snake", seq_number)
+                    #self.sock.send("GetToken " + str(A) + " Snake")
                     print "OUT   - GetToken ", A, " Snake"
                     state += 1
                 elif state == 1:
@@ -49,7 +54,8 @@ class Client:
                         state = 0
                     else:
                         B, proto_number = token[1], token[3]
-                        self.sock.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number))
+                        self.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number), seq_number)
+                        #self.sock.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number))
                         print "OUT  - Connect /challenge/", B, "/protocol/", proto_number
                         state += 1
                 elif state == 3:
@@ -66,7 +72,6 @@ class Client:
             except socket.timeout:
                 # If timeout, return to state 0
                 state = 0
-
         return
 
     def close(self):
