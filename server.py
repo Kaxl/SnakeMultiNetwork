@@ -27,7 +27,7 @@ class Server:
         print 'Listening to port', port, '...'
 
         # Trap keyboard interrupts
-        signal.signal(signal.SIGINT, self.sighandler)
+        #signal.signal(signal.SIGINT, self.sighandler)
 
     def waitConnections(self):
         # Num seq = 0xFFFFFFFF
@@ -39,7 +39,7 @@ class Server:
 
             try:
                 # 1. Wait for <<GetToken A Snake>>
-                data_token, addr = self.server.recv(BUF_SIZE)
+                data_token, addr = self.server.recvfrom(BUF_SIZE)
                 print "IN   - ", data_token
 
                 token = data_token.split()
@@ -47,7 +47,7 @@ class Server:
                 # TODO Check if A already used
                 B = random.randint(0, (1 << 32) - 1)
                 # 2. Send <<Token B A ProtocoleNumber>>
-                self.server.sendto("Token " + str(B) + " " + str(A) + " " + SnakeChannel.protocol, (addr, self.port))
+                self.server.sendto("Token " + str(B) + " " + str(A) + " " + str(SnakeChannel.protocol), (addr, self.port))
                 print "OUT   - Token ", B, " ", A, " ", SnakeChannel.protocol
 
                 # 3. Wait for <<Connect /nom_cle/val_cle/.../...>>
