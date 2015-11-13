@@ -61,14 +61,13 @@ class Server(SnakeChannel):
                     print "IN   - ", data
 
                     token = data.split()
-                    A = token[1]
-                    # TODO Check if A already used
+                    a = token[1]
 
                     # Generate random B
-                    B = random.randint(0, (1 << 32) - 1)
+                    b = random.randint(0, (1 << 32) - 1)
                     # 2. Send <<Token B A ProtocolNumber>>
-                    self.send("Token " + str(B) + " " + str(A) + " " + str(PROTOCOL_NUMBER), conn, SEQ_OUTBAND)
-                    print "OUT  - Token ", B, " ", A, " ", PROTOCOL_NUMBER
+                    self.send("Token " + str(b) + " " + str(a) + " " + str(PROTOCOL_NUMBER), conn, SEQ_OUTBAND)
+                    print "OUT  - Token ", b, " ", a, " ", PROTOCOL_NUMBER
 
                 elif state == STATE_2_S:
                     # 3. Wait for <<Connect /challenge/B/protocol/...>>
@@ -81,12 +80,12 @@ class Server(SnakeChannel):
                     param = token[1].split('/')
 
                     # Check the B value
-                    if len(param) < 3 or int(B) != int(param[2]):
+                    if len(param) < 3 or int(b) != int(param[2]):
                         continue
 
                     # 4. Send <<Connected B>>
-                    self.send("Connected " + str(B), conn, SEQ_OUTBAND)
-                    print "OUT  - Connected ", B
+                    self.send("Connected " + str(b), conn, SEQ_OUTBAND)
+                    print "OUT  - Connected ", b
                     self.connections[conn] = 0
 
                 elif state == STATE_3_S:

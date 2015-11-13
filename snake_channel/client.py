@@ -41,13 +41,14 @@ class Client(SnakeChannel):
         :return:
         """
         state = 0
-        A = random.randint(0, (1 << 32) - 1)
+        ack_token = ""
+        a = random.randint(0, (1 << 32) - 1)
         while state < 5:
             try:
                 if state == 0:
                     # 1. Send <<GetToken A Snake>>
-                    self.send("GetToken " + str(A) + " Snake", (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
-                    print "OUT   - GetToken ", A, " Snake"
+                    self.send("GetToken " + str(a) + " Snake", (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
+                    print "OUT   - GetToken ", a, " Snake"
                     state += 1
                 elif state == 1:
                     # 2. Wait for <<Token B A ProtocolNumber>>
@@ -62,13 +63,13 @@ class Client(SnakeChannel):
                     # 3. Send <<Connect /nom_cle/val_cle/.../...>>
                     token = ack_token.split()
                     # Check if A value is correct
-                    if int(token[2]) != int(A):
+                    if int(token[2]) != int(a):
                         state = 0
                     else:
-                        B, proto_number = token[1], token[3]
-                        self.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number),
+                        b, proto_number = token[1], token[3]
+                        self.send("Connect /challenge/" + str(b) + "/protocol/" + str(proto_number),
                                   (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
-                        print "OUT  - Connect /challenge/", B, "/protocol/", proto_number
+                        print "OUT  - Connect /challenge/", b, "/protocol/", proto_number
                         state += 1
 
                 elif state == 3:
@@ -79,7 +80,7 @@ class Client(SnakeChannel):
                         state = 2
                     else:
                         token = ack_connect.split()
-                        B = token[1]
+                        b = token[1] # TODO : Store b value ?
                         state += 1
                 elif state == 4:
                     # Client is connected
@@ -98,8 +99,7 @@ class Client(SnakeChannel):
         :return:
         """
         for i in range(1, 100):
-            self.send(str(self.connections[(IP_SERVER, PORT_SERVER)]) + " Test - Hello World ", (IP_SERVER, PORT_SERVER))
+            self.send(str(self.connections[(IP_SERVER, PORT_SERVER)]) + " Test - Hello World", (IP_SERVER, PORT_SERVER))
 
 if __name__ == "__main__":
     c = Client(port=5006)
-
