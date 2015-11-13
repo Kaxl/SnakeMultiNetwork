@@ -8,3 +8,6 @@ MAX_CLIENT = 10
 PROTOCOL_NUMBER = 19
 SEQ_OUTBAND = 0xffffffff
 
+STATE_1_S = "GetToken"
+STATE_2_S = "Connect"
+STATE_3_S = "Game"

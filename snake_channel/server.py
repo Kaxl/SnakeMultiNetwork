@@ -1,8 +1,6 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-
-
 import socket
 import random
 from snake_channel import SnakeChannel
@@ -28,18 +26,11 @@ class Server(SnakeChannel):
         # 3. Wait for <<Connect /nom_cle/val_cle/.../...>>
         # 4. Send <<Connected B>>
 
-            # input_s, output_s, except_s = select.select(input, [], [])
-
-            # for s in input_s:
-            #    if s == self.server:
-            #        conn, address = self.server.accept()
-            #        print 'got connection %d from %s' % (conn.fileno(), address)
-
-            # TODO : Mettre select
-            # TODO : A la reception d'un message, test le num de seq, si 0xF... gestion des connexions, sinon, gestion normale
         while True:
+            state = ""
             try:
-                #print "Wait for user"
+                # print "Wait for user"
+
                 # 1. Wait for <<GetToken A Snake>>
                 # data, conn = self.channel.recvfrom(BUFFER_SIZE)
                 data, conn = self.receive()
@@ -47,89 +38,52 @@ class Server(SnakeChannel):
                 if data is None:
                     continue
 
-                self.connections[conn] = 0
-                print "IN   - ", data
+                # Parse data to get the State
+                state = data.split()[0]
 
-                token = data.split()
-                A = token[1]
-                # TODO Check if A already used
-                # Generate random B
-                B = random.randint(0, (1 << 32) - 1)
-                # 2. Send <<Token B A ProtocolNumber>>
-                self.send("Token " + str(B) + " " + str(A) + " " + str(PROTOCOL_NUMBER), conn, SEQ_OUTBAND)
-                print "OUT  - Token ", B, " ", A, " ", PROTOCOL_NUMBER
+                if state == STATE_1_S:
+                    self.connections[conn] = 0
+                    print "IN   - ", data
 
-                # 3. Wait for <<Connect /challenge/B/protocol/...>>
-                data, conn = self.receive()
-                if data is None:
-                    continue
+                    token = data.split()
+                    A = token[1]
+                    # TODO Check if A already used
 
-                print "IN   - ", data
+                    # Generate random B
+                    B = random.randint(0, (1 << 32) - 1)
+                    # 2. Send <<Token B A ProtocolNumber>>
+                    self.send("Token " + str(B) + " " + str(A) + " " + str(PROTOCOL_NUMBER), conn, SEQ_OUTBAND)
+                    print "OUT  - Token ", B, " ", A, " ", PROTOCOL_NUMBER
 
-                token = data.split()
-                param = token[1].split('/')
+                elif state == STATE_2_S:
+                    # 3. Wait for <<Connect /challenge/B/protocol/...>>
 
-                # Check the B value
-                if len(param) < 3 or int(B) != int(param[2]):
-                    print "next"
-                    break
-                    continue
+                    if data is None:
+                        continue
 
-                # 4. Send <<Connected B>>
-                self.send("Connected " + str(B), conn, SEQ_OUTBAND)
-                print "OUT  - Connected ", B
-                break
+                    print "IN   - ", data
+
+                    token = data.split()
+                    param = token[1].split('/')
+
+                    # Check the B value
+                    if len(param) < 3 or int(B) != int(param[2]):
+                        print "next"
+                        continue
+
+                    # 4. Send <<Connected B>>
+                    self.send("Connected " + str(B), conn, SEQ_OUTBAND)
+                    print "OUT  - Connected ", B
+                    self.connections[conn] = 0
+
+                elif state == STATE_3_S:
+                    pass
+                else:
+                    print data
+
             except socket.timeout:
                 print 'Error timeout'
-
-
-"""
-            inputready, outputready, exceptready = select.select(input, [], [])
-
-            for s in inputready:
-                if s == self.server:
-                    conn, address = self.server.accept()
-                    print 'got connection %d from %s' % (conn.fileno(), address)
-
-                    try:
-                        # 1. Wait for <<GetToken A Snake>>
-                        data_token = self.server.recv(4096)
-                        print "IN   - ", data_token
-
-                        token = data_token.split()
-                        A = token[1]
-                        # TODO Check if A already used
-                        B = random.randint(0, (1 << 32) - 1)
-                        # 2. Send <<Token B A ProtocoleNumber>>
-                        self.server.send("Token " + str(B) + " " + str(A) + " " + SnakeChannel.protocol)
-                        print "OUT   - Token ", B, " ", A, " ", SnakeChannel.protocol
-
-                        # 3. Wait for <<Connect /nom_cle/val_cle/.../...>>
-                        data_connect = self.server.recv(4096)
-                        print "IN   - ", data_connect
-
-                        token = data_connect.split()
-                        param = token[1].split('/')
-
-                        # Check the B value
-                        if B != param[2]:
-                            continue
-
-                        # 4. Send <<Connected B>>
-                        self.server.send("Connected " + str(B))
-                        print "OUT   - Connected ", B
-
-                    except socket.timeout:
-                        print 'Error timeout'
-"""
 
 if __name__ == "__main__":
     s = Server()
     s.message_management()
-
-
-# TODO
-# class Server:
-#
-#    def accept_connextion(self):
-#        return

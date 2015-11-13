@@ -23,7 +23,7 @@ class Client(SnakeChannel):
         # 4. Wait for <<Connected B>>
         state = 0
         A = random.randint(0, (1 << 32) - 1)
-        while state < 4:
+        while state < 5:
             try:
                 if state == 0:
                     #self.channel.connect((self.ip, self.port))
@@ -41,19 +41,19 @@ class Client(SnakeChannel):
                         state = 0
                     else:
                         state += 1
+
                 elif state == 2:
                     token = ack_token.split()
                     # Check if A value is correct
-                    if int(token[2]) != int(A):  # WTF comparaison ???
-                        print "state 0"
+                    if int(token[2]) != int(A):
                         state = 0
                     else:
                         B, proto_number = token[1], token[3]
                         self.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number),
                                   (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
-                        # self.sock.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number))
                         print "OUT  - Connect /challenge/", B, "/protocol/", proto_number
                         state += 1
+
                 elif state == 3:
                     ack_connect, conn = self.receive()
                     print "IN   - ", ack_connect
@@ -63,6 +63,10 @@ class Client(SnakeChannel):
                         token = ack_connect.split()
                         B = token[1]
                         state += 1
+                elif state == 4:
+                    self.hello_world_message()
+                    state += 1
+
                 else:
                     print "Error during connection of client."
             except socket.timeout:
@@ -70,31 +74,10 @@ class Client(SnakeChannel):
                 state = 0
         return
 
-    def close(self):
-        return
-
+    def hello_world_message(self):
+        for i in range(1, 100):
+            self.send(str(self.connections[(IP_SERVER, PORT_SERVER)]) + " Test - Hello World ", (IP_SERVER, PORT_SERVER))
 
 if __name__ == "__main__":
-    c = Client()
+    c = Client(port=5006)
 
-# class SnakeChannel
-
-# class Token:
-#    """Structure de base d'un token (num_seq, data, ...)"""
-#
-#    num_seq = 1
-
-
-
-"""
-TODO
-Faire une horloge globale.
-
-A chaque iteration, verifier s'il faut renvoyer le message (si le temps requis
-est depasse, on renvoie)
-
-
-IP UDP(HEADER) SNAKECHAN PAYLOAD
-
-
-"""
