@@ -1,9 +1,9 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-import select
 import socket
 import struct
+import json
 
 from constants import *
 
@@ -23,21 +23,35 @@ class SnakeChannel(object):
             self.connections[connection] = seq
 
         # Pack (big endian) and send message
-        self.channel.sendto(struct.pack('!I%ds' % (len(data),), self.connections[connection], data), connection)
+        #self.channel.sendto(struct.pack('!I%ds' % (len(data),), self.connections[connection], data), connection)
+        self.channel.sendto(json.dumps({'seq': self.connections[connection],
+                                        'data': data}), connection)
 
     def receive(self):
         """Receive data with sequence number"""
         # fromto -> unpack -> check seq number
         # Verification of sequence number
-        data, address = self.channel.recvfrom(BUFFER_SIZE)
-        seq_number, payload = struct.unpack('!Is', data)
 
-        if (self.connections[address] < seq_number or
-            (seq_number < self.connections[address] and
-            (self.connections[address] - seq_number) > (1 << 31))):
-            return payload, address
+        try:
+            data, address = self.channel.recvfrom(BUFFER_SIZE)
+            #seq_number, payload = struct.unpack('!Is', data)
+            json_data = json.loads(data)
+            print json_data
+            seq_number, payload = json_data['seq'], json_data['data']
+            print "seq : ", seq_number
+            print "payload : ", payload
+            if self.connections.get(address) is None:
+                self.connections[address] = None
 
-        return None
+            if ((seq_number == SEQ_OUTBAND and self.connections[address] is None) or
+                (self.connections[address] < seq_number) or
+                (seq_number < self.connections[address] and
+                (self.connections[address] - seq_number) > (1 << 31))):
+                return payload, address
+        except socket.error:
+            pass
+
+        return None, None
 
 
 

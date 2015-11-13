@@ -29,13 +29,13 @@ class Client(SnakeChannel):
                     self.channel.connect((self.ip, self.port))
                     print 'Connect'
                     # 1. Send <<GetToken A Snake>>
-                    self.send("GetToken " + str(A) + " Snake", SEQ_OUTBAND)
+                    self.send("GetToken " + str(A) + " Snake", (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
                     # self.sock.send("GetToken " + str(A) + " Snake")
                     print "OUT   - GetToken ", A, " Snake"
                     state += 1
                 elif state == 1:
                     # 2. Wait for <<Token B A ProtocoleNumber>>
-                    ack_token = self.receive()
+                    ack_token, conn = self.receive()
                     print "IN   - ", ack_token
                     if ack_token is None:
                         state = 0
@@ -49,12 +49,13 @@ class Client(SnakeChannel):
                         state = 0
                     else:
                         B, proto_number = token[1], token[3]
-                        self.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number), SEQ_OUTBAND)
+                        self.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number),
+                                  (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
                         # self.sock.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number))
                         print "OUT  - Connect /challenge/", B, "/protocol/", proto_number
                         state += 1
                 elif state == 3:
-                    ack_connect = self.receive()
+                    ack_connect, conn = self.receive()
                     print "IN   - ", ack_connect
                     if ack_connect is None:
                         state = 2

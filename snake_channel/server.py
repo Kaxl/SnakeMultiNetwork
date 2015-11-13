@@ -3,10 +3,8 @@
 
 
 
-import socket  # Import socket module
-import select
+import socket
 import random
-import signal
 from snake_channel import SnakeChannel
 
 from constants import *
@@ -45,6 +43,10 @@ class Server(SnakeChannel):
                 # 1. Wait for <<GetToken A Snake>>
                 # data, conn = self.channel.recvfrom(BUFFER_SIZE)
                 data, conn = self.receive()
+                print "before"
+                if data is None:
+                    continue
+                print "TADA"
                 self.connections[conn] = 0
                 print "IN   - ", data
 
@@ -54,11 +56,14 @@ class Server(SnakeChannel):
                 # Generate random B
                 B = random.randint(0, (1 << 32) - 1)
                 # 2. Send <<Token B A ProtocolNumber>>
-                self.send("Token " + str(B) + " " + str(A) + " " + str(PROTOCOL_NUMBER), SEQ_OUTBAND)
+                self.send("Token " + str(B) + " " + str(A) + " " + str(PROTOCOL_NUMBER), conn, SEQ_OUTBAND)
                 print "OUT  - Token ", B, " ", A, " ", PROTOCOL_NUMBER
 
                 # 3. Wait for <<Connect /challenge/B/protocol/...>>
-                data = self.receive()
+                data, conn = self.receive()
+                if data is not None:
+                    continue
+
                 print "IN   - ", data
 
                 token = data.split()
