@@ -9,30 +9,45 @@ from constants import *
 
 
 class Server(SnakeChannel):
+    """Class Server
 
+    Inherits from SnakeChannel for its send and receive method.
+    The server waits for messages.
+    If the state is in the connection phase, we handle de connection of the client.
+    If the state is already established for the client, we handle the game positions.
+    """
     def __init__(self, ip=IP_SERVER, port=PORT_SERVER):
-        super(Server, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
+        """Initialization of Server class
 
-        self.ip = ip
-        self.port = port
+        :param ip: IP of server
+        :param port: Port of server
+        :return:
+        """
+        super(Server, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
+        self.ip = ip                        # IP of server
+        self.port = port                    # Port of server
         self.channel.setblocking(False)     # Non-blocking
         self.channel.bind((self.ip, self.port))
         print 'Listening to port', self.port, '...'
 
     def message_management(self):
-        # Num seq = 0xFFFFFFFF
-        # 1. Wait for <<GetToken A Snake>>
-        # 2. Send <<Token B A ProtocoleNumber>>
-        # 3. Wait for <<Connect /nom_cle/val_cle/.../...>>
-        # 4. Send <<Connected B>>
+        """Management of messages
+
+        States :
+        Num seq = 0xFFFFFFFF
+        1. Wait for <<GetToken A Snake>>
+        2. Send <<Token B A ProtocoleNumber>>
+        3. Wait for <<Connect /nom_cle/val_cle/.../...>>
+        4. Send <<Connected B>>
+
+        After the connection phase :
+        The server sends game info to the clients
+        :return:
+        """
 
         while True:
-            state = ""
             try:
-                # print "Wait for user"
-
                 # 1. Wait for <<GetToken A Snake>>
-                # data, conn = self.channel.recvfrom(BUFFER_SIZE)
                 data, conn = self.receive()
 
                 if data is None:
@@ -57,18 +72,16 @@ class Server(SnakeChannel):
 
                 elif state == STATE_2_S:
                     # 3. Wait for <<Connect /challenge/B/protocol/...>>
-
                     if data is None:
                         continue
 
                     print "IN   - ", data
-
+                    # Split data and get the parameters
                     token = data.split()
                     param = token[1].split('/')
 
                     # Check the B value
                     if len(param) < 3 or int(B) != int(param[2]):
-                        print "next"
                         continue
 
                     # 4. Send <<Connected B>>
@@ -77,6 +90,7 @@ class Server(SnakeChannel):
                     self.connections[conn] = 0
 
                 elif state == STATE_3_S:
+                    # Client is connected
                     pass
                 else:
                     print data

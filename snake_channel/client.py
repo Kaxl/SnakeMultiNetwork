@@ -8,33 +8,49 @@ from snake_channel import SnakeChannel
 
 
 class Client(SnakeChannel):
+    """Class Client
+
+    Inherits from SnakeChannel for its send and receive method.
+    The client handle the connection and then waits for snakes update.
+    """
     def __init__(self, ip='127.0.0.1', port=5006):
+        """Initialization of Client class
+
+        :param ip: IP of client
+        :param port: Port of client
+        :return:
+        """
         super(Client, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
-        self.ip = ip
-        self.port = int(port)
-        self.channel.settimeout(2)     # Timeout
+        self.ip = ip                    # IP of client
+        self.port = int(port)           # Port of client
+        self.channel.settimeout(2)      # Timeout
         self.connect()
 
     def connect(self):
-        # Num seq = 0xFFFFFFFF
-        # 1. Send <<GetToken A Snake>>
-        # 2. Wait for <<Token B A ProtocolNumber>>
-        # 3. Send <<Connect /nom_cle/val_cle/.../...>>
-        # 4. Wait for <<Connected B>>
+        """Connection of clients
+
+        States of connection :
+        Num seq = 0xFFFFFFFF
+        1. Send <<GetToken A Snake>>
+        2. Wait for <<Token B A ProtocolNumber>>
+        3. Send <<Connect /nom_cle/val_cle/.../...>>
+        4. Wait for <<Connected B>>
+
+        After the connection :
+        Receive game info
+        :return:
+        """
         state = 0
         A = random.randint(0, (1 << 32) - 1)
         while state < 5:
             try:
                 if state == 0:
-                    #self.channel.connect((self.ip, self.port))
-                    print 'Connect'
                     # 1. Send <<GetToken A Snake>>
                     self.send("GetToken " + str(A) + " Snake", (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
-                    # self.sock.send("GetToken " + str(A) + " Snake")
                     print "OUT   - GetToken ", A, " Snake"
                     state += 1
                 elif state == 1:
-                    # 2. Wait for <<Token B A ProtocoleNumber>>
+                    # 2. Wait for <<Token B A ProtocolNumber>>
                     ack_token, conn = self.receive()
                     print "IN   - ", ack_token
                     if ack_token is None:
@@ -43,6 +59,7 @@ class Client(SnakeChannel):
                         state += 1
 
                 elif state == 2:
+                    # 3. Send <<Connect /nom_cle/val_cle/.../...>>
                     token = ack_token.split()
                     # Check if A value is correct
                     if int(token[2]) != int(A):
@@ -55,6 +72,7 @@ class Client(SnakeChannel):
                         state += 1
 
                 elif state == 3:
+                    # 4. Wait for <<Connected B>>
                     ack_connect, conn = self.receive()
                     print "IN   - ", ack_connect
                     if ack_connect is None:
@@ -64,6 +82,7 @@ class Client(SnakeChannel):
                         B = token[1]
                         state += 1
                 elif state == 4:
+                    # Client is connected
                     self.hello_world_message()
                     state += 1
 
@@ -75,6 +94,9 @@ class Client(SnakeChannel):
         return
 
     def hello_world_message(self):
+        """Test function
+        :return:
+        """
         for i in range(1, 100):
             self.send(str(self.connections[(IP_SERVER, PORT_SERVER)]) + " Test - Hello World ", (IP_SERVER, PORT_SERVER))
 

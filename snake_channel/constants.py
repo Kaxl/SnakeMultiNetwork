@@ -1,13 +1,13 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-BUFFER_SIZE = 4096
 IP_SERVER = "127.0.0.1"
 PORT_SERVER = 5005
-MAX_CLIENT = 10
+BUFFER_SIZE = 4096
 PROTOCOL_NUMBER = 19
-SEQ_OUTBAND = 0xffffffff
+SEQ_OUTBAND = 0xffffffff    # Message for the connection
 
+# State for the server
 STATE_1_S = "GetToken"
 STATE_2_S = "Connect"
 STATE_3_S = "Game"

@@ -7,30 +7,54 @@ from constants import *
 
 
 class SnakeChannel(object):
+    """Class SnakeChannel
+
+    Handle the send and receive of messages protocol.
+    This class is inherited by Client and Server class to send and receive message.
+    It contains a channel (socket) and a dictionary of connections :
+    key : (ip, port)
+    value : sequence number
+
+    TODO : Do we need to have the B value for security issues ? (crypt / decrypt)
+    """
     def __init__(self, channel):
+        """Initialization of SnakeChannel
+
+        :param channel: Socket for the connection
+        :return:
+        """
         self.channel = channel
         self.connections = {}
         pass
 
     def send(self, data, connection, seq=None):
         """Send data with sequence number
-        :param connection:
+
+        If a sequence number is provided and is 0xffffffff, then this
+        is an outbound message and we process it.
+        Else, we increment the sequence number.
+
+        :param data: data to send
+        :param connection: connection (ip, port)
+        :param seq: sequence number if provided
         """
         if seq is None:  # Incrementation of sequence number (modulo)
             self.connections[connection] = (self.connections[connection] + 1) % (0x1 << 32)
         else:  # Sequence number is 0xFFFFFFFF -> connection packet
             self.connections[connection] = seq
 
-        # Pack (big endian) and send message
-        # self.channel.sendto(struct.pack('!I%ds' % (len(data),), self.connections[connection], data), connection)
+        # Send the message in json format
         self.channel.sendto(json.dumps({'seq': self.connections[connection],
                                         'data': data}), connection)
 
     def receive(self):
-        """Receive data with sequence number"""
-        # fromto -> unpack -> check seq number
-        # Verification of sequence number
+        """Receive data with sequence number
 
+        Verification of sequence message.
+        If this is the first time we manage this connection, we add his sequence number
+        as 0xffffffff for the connection phase (out of band messages).
+        :return:
+        """
         try:
             data, address = self.channel.recvfrom(BUFFER_SIZE)
             json_data = json.loads(data)
