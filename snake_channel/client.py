@@ -3,44 +3,39 @@
 
 import socket  # Import socket module
 import random
-
 from constants import *
-
 from snake_channel import SnakeChannel
 
 
 class Client(SnakeChannel):
-
-    def __init__(self, host='127.0.0.1', port=5005):
-        self.host = host
+    def __init__(self, ip='127.0.0.1', port=5006):
+        super(Client, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
+        self.ip = ip
         self.port = int(port)
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        #self.sock.setblocking(False)    # Non-blocking
-        self.sock.settimeout(1)         # Timeout
+        self.channel.settimeout(1)     # Timeout
         self.connect()
 
     def connect(self):
         # Num seq = 0xFFFFFFFF
         # 1. Send <<GetToken A Snake>>
-        # 2. Wait for <<Token B A ProtocoleNumber>>
+        # 2. Wait for <<Token B A ProtocolNumber>>
         # 3. Send <<Connect /nom_cle/val_cle/.../...>>
         # 4. Wait for <<Connected B>>
-        seq_number = 0xFFFFFFFF
         state = 0
         A = random.randint(0, (1 << 32) - 1)
         while state < 4:
             try:
                 if state == 0:
-                    self.sock.connect((self.host, self.port))
+                    self.channel.connect((self.ip, self.port))
                     print 'Connect'
                     # 1. Send <<GetToken A Snake>>
-                    self.send("GetToken " + str(A) + " Snake", seq_number)
-                    #self.sock.send("GetToken " + str(A) + " Snake")
+                    self.send("GetToken " + str(A) + " Snake", SEQ_OUTBAND)
+                    # self.sock.send("GetToken " + str(A) + " Snake")
                     print "OUT   - GetToken ", A, " Snake"
                     state += 1
                 elif state == 1:
                     # 2. Wait for <<Token B A ProtocoleNumber>>
-                    ack_token = self.sock.recv(4096)
+                    ack_token = self.receive()
                     print "IN   - ", ack_token
                     if ack_token is None:
                         state = 0
@@ -49,17 +44,17 @@ class Client(SnakeChannel):
                 elif state == 2:
                     token = ack_token.split()
                     # Check if A value is correct
-                    if int(token[2]) != int(A):   # WTF comparaison ???
+                    if int(token[2]) != int(A):  # WTF comparaison ???
                         print "state 0"
                         state = 0
                     else:
                         B, proto_number = token[1], token[3]
-                        self.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number), seq_number)
-                        #self.sock.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number))
+                        self.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number), SEQ_OUTBAND)
+                        # self.sock.send("Connect /challenge/" + str(B) + "/protocol/" + str(proto_number))
                         print "OUT  - Connect /challenge/", B, "/protocol/", proto_number
                         state += 1
                 elif state == 3:
-                    ack_connect = self.sock.recv(4096)
+                    ack_connect = self.receive()
                     print "IN   - ", ack_connect
                     if ack_connect is None:
                         state = 2
@@ -77,9 +72,9 @@ class Client(SnakeChannel):
     def close(self):
         return
 
+
 if __name__ == "__main__":
     c = Client()
-
 
 # class SnakeChannel
 

@@ -11,26 +11,17 @@ from snake_channel import SnakeChannel
 
 from constants import *
 
-MAX_CLIENT = 10
-UDP_IP = "127.0.0.1"
-UDP_PORT = 5005
-BUF_SIZE = 4096
-
 
 class Server(SnakeChannel):
 
-    def __init__(self, ip=UDP_IP, port=UDP_PORT):
-        self.clients = []
-        self.outputs = []
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    def __init__(self, ip=IP_SERVER, port=PORT_SERVER):
+        super(Server, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
+
         self.ip = ip
         self.port = port
-        self.server.bind((ip, port))
-        # self.server.listen(10)
-        print 'Listening to port', port, '...'
-
-        # Trap keyboard interrupts
-        # signal.signal(signal.SIGINT, self.sighandler)
+        self.channel.setblocking(False)     # Non-blocking
+        self.channel.bind((self.ip, self.port))
+        print 'Listening to port', self.port, '...'
 
     def message_management(self):
         # Num seq = 0xFFFFFFFF
@@ -38,7 +29,7 @@ class Server(SnakeChannel):
         # 2. Send <<Token B A ProtocoleNumber>>
         # 3. Wait for <<Connect /nom_cle/val_cle/.../...>>
         # 4. Send <<Connected B>>
-        while True:
+
             # input_s, output_s, except_s = select.select(input, [], [])
 
             # for s in input_s:
@@ -48,28 +39,29 @@ class Server(SnakeChannel):
 
             # TODO : Mettre select
             # TODO : A la reception d'un message, test le num de seq, si 0xF... gestion des connexions, sinon, gestion normale
-
+        while True:
             try:
                 print "Wait for user"
                 # 1. Wait for <<GetToken A Snake>>
-                data_token, address = self.server.recvfrom(BUFFER_SIZE)
-                self.clients[address] = 0
-                print "IN   - ", data_token
+                # data, conn = self.channel.recvfrom(BUFFER_SIZE)
+                data, conn = self.receive()
+                self.connections[conn] = 0
+                print "IN   - ", data
 
-                token = data_token.split()
+                token = data.split()
                 A = token[1]
                 # TODO Check if A already used
                 # Generate random B
                 B = random.randint(0, (1 << 32) - 1)
-                # 2. Send <<Token B A ProtocoleNumber>>
-                self.server.sendto("Token " + str(B) + " " + str(A) + " " + str(SnakeChannel.protocol), addr)
-                print "OUT  - Token ", B, " ", A, " ", SnakeChannel.protocol
+                # 2. Send <<Token B A ProtocolNumber>>
+                self.send("Token " + str(B) + " " + str(A) + " " + str(PROTOCOL_NUMBER), SEQ_OUTBAND)
+                print "OUT  - Token ", B, " ", A, " ", PROTOCOL_NUMBER
 
                 # 3. Wait for <<Connect /challenge/B/protocol/...>>
-                data_connect, addr = self.server.recvfrom(4096)
-                print "IN   - ", data_connect
+                data = self.receive()
+                print "IN   - ", data
 
-                token = data_connect.split()
+                token = data.split()
                 param = token[1].split('/')
 
                 # Check the B value
@@ -78,7 +70,7 @@ class Server(SnakeChannel):
                     continue
 
                 # 4. Send <<Connected B>>
-                self.server.sendto("Connected " + str(B), addr)
+                self.send("Connected " + str(B), conn, SEQ_OUTBAND)
                 print "OUT  - Connected ", B
             except socket.timeout:
                 print 'Error timeout'
