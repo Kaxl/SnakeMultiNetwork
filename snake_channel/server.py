@@ -39,14 +39,14 @@ class Server(SnakeChannel):
             # TODO : A la reception d'un message, test le num de seq, si 0xF... gestion des connexions, sinon, gestion normale
         while True:
             try:
-                print "Wait for user"
+                #print "Wait for user"
                 # 1. Wait for <<GetToken A Snake>>
                 # data, conn = self.channel.recvfrom(BUFFER_SIZE)
                 data, conn = self.receive()
-                print "before"
+
                 if data is None:
                     continue
-                print "TADA"
+
                 self.connections[conn] = 0
                 print "IN   - ", data
 
@@ -61,7 +61,7 @@ class Server(SnakeChannel):
 
                 # 3. Wait for <<Connect /challenge/B/protocol/...>>
                 data, conn = self.receive()
-                if data is not None:
+                if data is None:
                     continue
 
                 print "IN   - ", data
@@ -72,11 +72,13 @@ class Server(SnakeChannel):
                 # Check the B value
                 if len(param) < 3 or int(B) != int(param[2]):
                     print "next"
+                    break
                     continue
 
                 # 4. Send <<Connected B>>
                 self.send("Connected " + str(B), conn, SEQ_OUTBAND)
                 print "OUT  - Connected ", B
+                break
             except socket.timeout:
                 print 'Error timeout'
 

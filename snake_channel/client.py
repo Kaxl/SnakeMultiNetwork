@@ -12,7 +12,7 @@ class Client(SnakeChannel):
         super(Client, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
         self.ip = ip
         self.port = int(port)
-        self.channel.settimeout(1)     # Timeout
+        self.channel.settimeout(2)     # Timeout
         self.connect()
 
     def connect(self):
@@ -26,7 +26,7 @@ class Client(SnakeChannel):
         while state < 4:
             try:
                 if state == 0:
-                    self.channel.connect((self.ip, self.port))
+                    #self.channel.connect((self.ip, self.port))
                     print 'Connect'
                     # 1. Send <<GetToken A Snake>>
                     self.send("GetToken " + str(A) + " Snake", (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
