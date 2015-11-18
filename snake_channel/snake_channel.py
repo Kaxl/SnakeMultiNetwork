@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import socket
-import json
+import struct
 from constants import *
 
 
@@ -43,9 +43,13 @@ class SnakeChannel(object):
         else:  # Sequence number is 0xFFFFFFFF -> connection packet
             self.connections[connection] = seq
 
-        # Send the message in json format
-        self.channel.sendto(json.dumps({'seq': self.connections[connection],
-                                        'data': data}), connection)
+        # Pack the sequence number
+        pack = struct.pack('>I', self.connections[connection])
+        # Concatenation of data
+        pack += data
+
+        # Send the message
+        self.channel.sendto(pack, connection)
 
     def receive(self):
         """Receive data with sequence number
@@ -57,8 +61,8 @@ class SnakeChannel(object):
         """
         try:
             data, address = self.channel.recvfrom(BUFFER_SIZE)
-            json_data = json.loads(data)
-            seq_number, payload = json_data['seq'], json_data['data']
+            seq_number = struct.unpack('>I', data[:4])[0]
+            payload = data[4:]
 
             if self.connections.get(address) is None:
                 self.connections[address] = SEQ_OUTBAND
