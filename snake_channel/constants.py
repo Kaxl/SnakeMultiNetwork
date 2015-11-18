@@ -11,3 +11,9 @@ SEQ_OUTBAND = 0xffffffff    # Message for the connection
 STATE_1_S = "GetToken"
 STATE_2_S = "Connect"
 STATE_3_S = "Game"
+
+# Index for dictionary of server
+D_SEQNUM = 0    # Sequence number
+D_STATUS = 1    # Status (connected / not connected)
+D_LASTP = 2     # Last ping
+
