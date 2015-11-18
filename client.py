@@ -3,11 +3,11 @@
 
 import socket  # Import socket module
 import time
-from constants import *
-from snake_channel import SnakeChannel
+from snake_channel.constants import *
+from snake_post.snake_post import SnakePost
 
 
-class Client(SnakeChannel):
+class Client(SnakePost):
     """Class Client
 
     Inherits from SnakeChannel for its send and receive method.

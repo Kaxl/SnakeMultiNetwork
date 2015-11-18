@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import socket
-import random
-from snake_channel import SnakeChannel
+from snake_post.snake_post import SnakePost
 
-from constants import *
+from snake_channel.constants import *
 
 
-class Server(SnakeChannel):
+class Server(SnakePost):
     """Class Server
 
     Inherits from SnakeChannel for its send and receive method.
