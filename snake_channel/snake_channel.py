@@ -48,70 +48,61 @@ class SnakeChannel(object):
 
         After the connection phase :
         The server sends game info to the clients
-        :param self:
         :return:
         """
-        while True:
-            try:
-                # Receive data from client
-                data, conn = self.receive()
+        try:
+            # Receive data from client
+            data, conn = self.receive()
 
-                if data is None:
-                    continue
+            if data is None:
+                return None
 
-                if self.connections[conn] is None:
-                    print "connections none"
-                    self.connections[conn] = (0, False, 0)
+            # Check if client is connected
+            if not self.connections[conn][D_STATUS]:
+                # Connection logic
+                # Parse data to get the State
+                state = data.split()[0]
 
-                # Check if client is connected
-                if not self.connections[conn][D_STATUS]:
-                    # Connection logic
-                    # Parse data to get the State
-                    state = data.split()[0]
+                # 1. Wait for <<GetToken A Snake>>
+                if state == STATE_1_S:
+                    self.connections[conn][D_SEQNUM] = 0
+                    print "IN   - ", data
 
-                    # 1. Wait for <<GetToken A Snake>>
-                    if state == STATE_1_S:
-                        self.connections[conn][D_SEQNUM] = 0
-                        print "IN   - ", data
+                    token = data.split()
+                    a = token[1]
 
-                        token = data.split()
-                        a = token[1]
+                    # Generate random B
+                    self.b = random.randint(0, (1 << 32) - 1)
 
-                        # Generate random B
-                        self.b = random.randint(0, (1 << 32) - 1)
+                    # 2. Send <<Token B A ProtocolNumber>>
+                    self.send("Token " + str(self.b) + " " + str(a) + " " + str(PROTOCOL_NUMBER), conn, SEQ_OUTBAND)
+                    print "OUT  - Token ", self.b, " ", a, " ", PROTOCOL_NUMBER
 
-                        # 2. Send <<Token B A ProtocolNumber>>
-                        self.send("Token " + str(self.b) + " " + str(a) + " " + str(PROTOCOL_NUMBER), conn, SEQ_OUTBAND)
-                        print "OUT  - Token ", self.b, " ", a, " ", PROTOCOL_NUMBER
+                elif state == STATE_2_S:
+                    # 3. Wait for <<Connect /challenge/B/protocol/...>>
+                    if data is None:
+                        return None
 
-                    elif state == STATE_2_S:
-                        # 3. Wait for <<Connect /challenge/B/protocol/...>>
-                        if data is None:
-                            continue
+                    print "IN   - ", data
+                    # Split data and get the parameters
+                    token = data.split()
+                    param = token[1].split('/')
 
-                        print "IN   - ", data
-                        # Split data and get the parameters
-                        token = data.split()
-                        param = token[1].split('/')
+                    # Check the B value
+                    if len(param) < 3 or int(self.b) != int(param[2]):
+                        return None
 
-                        # Check the B value
-                        if len(param) < 3 or int(self.b) != int(param[2]):
-                            continue
+                    # 4. Send <<Connected B>>
+                    self.send("Connected " + str(self.b), conn, SEQ_OUTBAND)
+                    print "OUT  - Connected ", self.b
+                    self.connections[conn][D_STATUS] = True
+            else:
+                # Client is connected, return the data
+                return data, conn
 
-                        # 4. Send <<Connected B>>
-                        self.send("Connected " + str(self.b), conn, SEQ_OUTBAND)
-                        print "OUT  - Connected ", self.b
-                        self.connections[conn][D_SEQNUM] = 0
-                        self.connections[conn][D_STATUS] = True
-                else:
-                    # Client is connected
-                    # Game logic
-                    print "Connected"
-
-            except socket.timeout:
-                print 'Error timeout'
-
-        return
+        except socket.timeout:
+            print 'Error timeout'
+        return None
 
     def connect(self):
         """Connection of clients
@@ -125,7 +116,6 @@ class SnakeChannel(object):
 
         After the connection :
         Receive game info
-        :param self:
         :return:
         """
         state = 0
@@ -180,11 +170,12 @@ class SnakeChannel(object):
     def send(self, data, connection=(IP_SERVER, PORT_SERVER), seq=None):
         """Send data with sequence number
 
+        Connection as a default value (IP server and port server)
+
         If a sequence number is provided and is 0xffffffff, then this
         is an outbound message and we process it.
         Else, we increment the sequence number.
 
-        :param self:
         :param data: data to send
         :param connection: connection (ip, port)
         :param seq: sequence number if provided
@@ -193,7 +184,6 @@ class SnakeChannel(object):
 
         if self.connections.get(connection) is None:
             self.connections[connection] = [SEQ_OUTBAND, False, 0]
-            # self.connections[connection][D_SEQNUM] = SEQ_OUTBAND
 
         # print self.connections
         if seq is None:  # Incrementation of sequence number (modulo)
@@ -215,19 +205,15 @@ class SnakeChannel(object):
         Verification of sequence message.
         If this is the first time we manage this connection, we add his sequence number
         as 0xffffffff for the connection phase (out of band messages).
-        :param self:
         :return:
         """
         try:
             data, address = self.channel.recvfrom(BUFFER_SIZE)
-            print "data : ", data
-            print "addr : ", address
             seq_number = struct.unpack('>I', data[:4])[0]
             payload = data[4:]
 
             if self.connections.get(address) is None:
                 self.connections[address] = [SEQ_OUTBAND, False, 0]
-                # self.connections[address][D_SEQNUM] = SEQ_OUTBAND
 
             if ((seq_number == SEQ_OUTBAND) or
                     (self.connections[address][D_SEQNUM] < seq_number) or

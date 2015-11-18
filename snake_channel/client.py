@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import socket  # Import socket module
-import random
+import time
 from constants import *
 from snake_channel import SnakeChannel
 
@@ -25,7 +25,6 @@ class Client(SnakeChannel):
         self.port = int(port)           # Port of client
         self.channel.settimeout(2)      # Timeout
         self.connect()
-        self.send("Hello")
 
     def hello_world_message(self):
         """Test function
@@ -36,3 +35,7 @@ class Client(SnakeChannel):
 
 if __name__ == "__main__":
     c = Client(port=5006)
+    while True:
+        c.send("Hello")
+        time.sleep(2)
+

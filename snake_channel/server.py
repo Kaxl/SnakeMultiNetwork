@@ -29,7 +29,11 @@ class Server(SnakeChannel):
         self.channel.setblocking(False)     # Non-blocking
         self.channel.bind((self.ip, self.port))
         print 'Listening to port', self.port, '...'
-        self.listen()
+
+        while True:
+            data = self.listen()
+            if data is not None:
+                print "Data : ", data
 
 if __name__ == "__main__":
     s = Server()
