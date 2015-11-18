@@ -111,7 +111,7 @@ class SnakeChannel(object):
             except socket.timeout:
                 print 'Error timeout'
 
-            return
+        return
 
     def connect(self):
         """Connection of clients
@@ -177,7 +177,7 @@ class SnakeChannel(object):
                 state = 0
         return
 
-    def send(self, data, connection, seq=None):
+    def send(self, data, connection=(IP_SERVER, PORT_SERVER), seq=None):
         """Send data with sequence number
 
         If a sequence number is provided and is 0xffffffff, then this
@@ -190,7 +190,12 @@ class SnakeChannel(object):
         :param seq: sequence number if provided
         """
         print connection
-        print self.connections
+
+        if self.connections.get(connection) is None:
+            self.connections[connection] = [SEQ_OUTBAND, False, 0]
+            # self.connections[connection][D_SEQNUM] = SEQ_OUTBAND
+
+        # print self.connections
         if seq is None:  # Incrementation of sequence number (modulo)
             self.connections[connection][D_SEQNUM] = (self.connections[connection][D_SEQNUM] + 1) % (0x1 << 32)
         else:  # Sequence number is 0xFFFFFFFF -> connection packet
@@ -221,7 +226,8 @@ class SnakeChannel(object):
             payload = data[4:]
 
             if self.connections.get(address) is None:
-                self.connections[address][D_SEQNUM] = SEQ_OUTBAND
+                self.connections[address] = [SEQ_OUTBAND, False, 0]
+                # self.connections[address][D_SEQNUM] = SEQ_OUTBAND
 
             if ((seq_number == SEQ_OUTBAND) or
                     (self.connections[address][D_SEQNUM] < seq_number) or
