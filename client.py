@@ -3,8 +3,9 @@
 
 import socket  # Import socket module
 import time
-from snake_channel.constants import *
+
 from snake_post.snake_post import SnakePost
+from constants import *
 
 
 class Client(SnakePost):

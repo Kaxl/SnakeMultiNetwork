@@ -4,7 +4,7 @@
 import socket
 from snake_post.snake_post import SnakePost
 
-from snake_channel.constants import *
+from constants import *
 
 
 class Server(SnakePost):
