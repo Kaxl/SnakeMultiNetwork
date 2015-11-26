@@ -34,5 +34,16 @@ class Server(SnakePost):
             if data is not None:
                 print "Data : ", data
 
+            data_secure = self.listen_secure()
+            if data_secure is not None:
+                #if data = position
+                #    broadcast position
+                #else if data = mange pomme
+                #    broacast info
+
+                #if new apple:
+                #    self.send_post()
+
+
 if __name__ == "__main__":
     s = Server()

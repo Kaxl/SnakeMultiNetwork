@@ -37,6 +37,10 @@ class Client(SnakePost):
 if __name__ == "__main__":
     c = Client(port=5006)
     while True:
-        c.send("Hello")
+        # Send position to the server
+        c.send("Position")
+        # Receive data from server
+        c.receive()
+        c.receive_post()
         time.sleep(2)
 
