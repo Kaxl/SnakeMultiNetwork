@@ -32,15 +32,15 @@ class Client(SnakePost):
         :return:
         """
         for i in range(1, 100):
-            self.send(str(self.connections[(IP_SERVER, PORT_SERVER)]) + " Test - Hello World", (IP_SERVER, PORT_SERVER))
+            self.send_channel(str(self.connections[(IP_SERVER, PORT_SERVER)]) + " Test - Hello World", (IP_SERVER, PORT_SERVER))
 
 if __name__ == "__main__":
     c = Client(port=5006)
     while True:
         # Send position to the server
-        c.send("Position")
+        c.send_channel("Position")
         # Receive data from server
-        c.receive()
+        c.receive_channel()
         c.receive_post()
         time.sleep(2)
 

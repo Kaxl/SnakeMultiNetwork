@@ -53,7 +53,7 @@ class SnakeChannel(object):
         """
         try:
             # Receive data from client
-            data, conn = self.receive()
+            data, conn = self.receive_channel()
 
             if data is None:
                 return None
@@ -76,7 +76,7 @@ class SnakeChannel(object):
                     self.b = random.randint(0, (1 << 32) - 1)
 
                     # 2. Send <<Token B A ProtocolNumber>>
-                    self.send("Token " + str(self.b) + " " + str(a) + " " + str(PROTOCOL_NUMBER), conn, SEQ_OUTBAND)
+                    self.send_channel("Token " + str(self.b) + " " + str(a) + " " + str(PROTOCOL_NUMBER), conn, SEQ_OUTBAND)
                     print "OUT  - Token ", self.b, " ", a, " ", PROTOCOL_NUMBER
 
                 elif state == STATE_2_S:
@@ -94,7 +94,7 @@ class SnakeChannel(object):
                         return None
 
                     # 4. Send <<Connected B>>
-                    self.send("Connected " + str(self.b), conn, SEQ_OUTBAND)
+                    self.send_channel("Connected " + str(self.b), conn, SEQ_OUTBAND)
                     print "OUT  - Connected ", self.b
                     self.connections[conn][D_STATUS] = True
             else:
@@ -126,12 +126,12 @@ class SnakeChannel(object):
             try:
                 if state == 0:
                     # 1. Send <<GetToken A Snake>>
-                    self.send("GetToken " + str(a) + " Snake", (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
+                    self.send_channel("GetToken " + str(a) + " Snake", (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
                     print "OUT   - GetToken ", a, " Snake"
                     state += 1
                 elif state == 1:
                     # 2. Wait for <<Token B A ProtocolNumber>>
-                    ack_token, conn = self.receive()
+                    ack_token, conn = self.receive_channel()
                     print "IN   - ", ack_token
                     if ack_token is None:
                         state = 0
@@ -146,14 +146,14 @@ class SnakeChannel(object):
                         state = 0
                     else:
                         b, proto_number = token[1], token[3]
-                        self.send("Connect /challenge/" + str(b) + "/protocol/" + str(proto_number),
-                                  (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
+                        self.send_channel("Connect /challenge/" + str(b) + "/protocol/" + str(proto_number),
+                                          (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
                         print "OUT  - Connect /challenge/", b, "/protocol/", proto_number
                         state += 1
 
                 elif state == 3:
                     # 4. Wait for <<Connected B>>
-                    ack_connect, conn = self.receive()
+                    ack_connect, conn = self.receive_channel()
                     print "IN   - ", ack_connect
                     if ack_connect is None:
                         state = 2
@@ -168,7 +168,7 @@ class SnakeChannel(object):
                 state = 0
         return
 
-    def send(self, data, connection=(IP_SERVER, PORT_SERVER), seq=None):
+    def send_channel(self, data, connection=(IP_SERVER, PORT_SERVER), seq=None):
         """Send data with sequence number
 
         Connection as a default value (IP server and port server)
@@ -200,7 +200,7 @@ class SnakeChannel(object):
         # Send the message
         self.channel.sendto(pack, connection)
 
-    def receive(self):
+    def receive_channel(self):
         """Receive data with sequence number
 
         Verification of sequence message.

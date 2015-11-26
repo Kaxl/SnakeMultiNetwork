@@ -36,7 +36,6 @@ def print1():
 def print2():
     print "TIMEOUT 2"
 
-
 if __name__ == "__main__":
     pygame.init()
 

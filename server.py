@@ -36,6 +36,7 @@ class Server(SnakePost):
 
             data_secure = self.listen_secure()
             if data_secure is not None:
+                pass
                 #if data = position
                 #    broadcast position
                 #else if data = mange pomme
