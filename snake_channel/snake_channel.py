@@ -54,7 +54,7 @@ class SnakeChannel(object):
             data, conn = self.receive_channel()
 
             if data is None:
-                return None
+                return None, None
 
             # Check if client is connected
             if not self.connections[conn][D_STATUS]:
@@ -80,7 +80,7 @@ class SnakeChannel(object):
                 elif state == STATE_2_S:
                     # 3. Wait for <<Connect /challenge/B/protocol/...>>
                     if data is None:
-                        return None
+                        return None, None
 
                     print "IN   - ", data
                     # Split data and get the parameters
@@ -89,7 +89,7 @@ class SnakeChannel(object):
 
                     # Check the B value
                     if len(param) < 3 or int(self.b) != int(param[2]):
-                        return None
+                        return None, None
 
                     # 4. Send <<Connected B>>
                     self.send_channel("Connected " + str(self.b), conn, SEQ_OUTBAND)
@@ -101,7 +101,7 @@ class SnakeChannel(object):
 
         except socket.timeout:
             print 'Error timeout'
-        return None
+        return None, None
 
     def connect(self):
         """Connection of clients

@@ -30,6 +30,7 @@ class SnakePost(SnakeChannel):
     def send(self, data, connection=(IP_SERVER, PORT_SERVER), secure=False):
         if not secure:
             self.buffer_normal.append((struct.pack('>2I', 0, 0) + data, connection))
+            print "[send] Not secure : Data = ", data, " - to : ", connection
         else:
             self.buffer_secure.append((struct.pack('>2I', random.randint(1, (1 << 32) - 1), 0) + data, connection))
 
@@ -75,11 +76,13 @@ class SnakePost(SnakeChannel):
         else:
             # Send NORMAL
             data, connection = self.buffer_normal.pop(0)
+            print "[send_post] Not secure : Data = ", str(data), " - to : ", connection
 
             if self.udp:  # on udp
                 self.channel.sendto(data, connection)
             else:  # on snake_channel
                 self.send_channel(data, connection)
+                print "[send_post] Sent !"
 
     def ack(self, seq_number, connection=(IP_SERVER, PORT_SERVER)):
         pack = struct.pack('>II', 0, seq_number)
@@ -97,7 +100,8 @@ class SnakePost(SnakeChannel):
         if self.udp:  # on udp
             data, conn = self.channel.recvfrom()
         else:  # on snake_channel
-            data, conn = self.receive_channel()
+            # data, conn = self.receive_channel()
+            data, conn = self.listen()
 
         if data is not None:
             seq_number = struct.unpack('>I', data[:4])[0]

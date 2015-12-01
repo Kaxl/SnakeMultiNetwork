@@ -28,12 +28,13 @@ class Server(SnakePost):
         print 'Listening to port', self.port, '...'
 
         while True:
-            data = self.listen()
-            if data is not None:
-                print "Data : ", data
+            # data = self.listen()
+            # if data is not None:
+            #    print "Data : ", data
 
             data_secure = self.receive_post()
             if data_secure is not None:
+                print "Data : ", data_secure
                 pass
                 #if data = position
                 #    broadcast position

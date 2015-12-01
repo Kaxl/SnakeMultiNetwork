@@ -38,9 +38,9 @@ if __name__ == "__main__":
     c = Client(port=5006)
     while True:
         # Send position to the server
-        c.send_channel("Position")
+        c.send("Position")
         # Receive data from server
-        c.receive_channel()
+        # c.receive_channel()
         c.receive_post()
         time.sleep(2)
 
