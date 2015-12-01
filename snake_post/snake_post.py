@@ -7,8 +7,7 @@ import pygame
 import random
 
 from constants import *
-
-from snake_channel.snake_channel import SnakeChannel
+from snake_channel import *
 
 
 class SnakePost(SnakeChannel):
@@ -16,8 +15,8 @@ class SnakePost(SnakeChannel):
     def __init__(self, channel, udp=False):
         super(SnakePost, self).__init__(channel)
         self.udp = udp
-        self.buffer_normal = list() # List to store packets to send
-        self.buffer_secure = list() # List to store secure packets to send
+        self.buffer_normal = list()     # List to store packets to send
+        self.buffer_secure = list()     # List to store secure packets to send
         pass
 
     def send(self, data, connection=(IP_SERVER, PORT_SERVER), secure=False):
