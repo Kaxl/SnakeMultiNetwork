@@ -1,13 +1,10 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-import socket
-import struct
-import pygame
-import random
-from constants import *
 from snake_channel import *
 from timer import *
+
+from constants import *
 
 
 class SnakePost(SnakeChannel):

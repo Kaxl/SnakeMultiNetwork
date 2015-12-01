@@ -1,9 +1,7 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-import socket
-from snake_post.snake_post import SnakePost
-
+from snake_post import *
 from constants import *
 
 
