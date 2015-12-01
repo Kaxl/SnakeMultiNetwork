@@ -32,7 +32,7 @@ class Server(SnakePost):
             if data is not None:
                 print "Data : ", data
 
-            data_secure = self.listen_secure()
+            data_secure = self.receive_post()
             if data_secure is not None:
                 pass
                 #if data = position

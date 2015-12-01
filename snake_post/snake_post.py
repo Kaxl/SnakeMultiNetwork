@@ -1,6 +1,8 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
+import struct
+
 from snake_channel import *
 from timer import *
 
@@ -16,8 +18,8 @@ class SnakePost(SnakeChannel):
         self.buffer_normal = list()  # List to store packets to send
         self.buffer_secure = list()  # List to store secure packets to send
 
-        self.secure_in_network = False
-        self.ack_received = False
+        self.secure_in_network = {}
+        self.ack_received = {}
 
         # Timers
         self.send_timer = Timer(SEND_INTERVAL, 0, True)
@@ -42,28 +44,38 @@ class SnakePost(SnakeChannel):
 
         :return:
         """
-        if self.buffer_secure and not self.secure_in_network:
+        if self.buffer_secure:
             # Send SECURE
             data, connection = self.buffer_secure[0]
-            self.ack_received = False
-            self.secure_in_network = True
-            if self.udp:  # on udp
-                self.channel.sendto(data, connection)
-            else:  # on snake_channel
-                self.send_channel(data, connection)
-            self.ack_timer.activate(0)
-        elif self.secure_in_network and not self.ack_received:
-            # RE-send SECURE
-            # If we didn't received ack for secure message, resend the message
-            if self.ack_timer.expired():
-                data, connection = self.buffer_secure[0]
+            if not self.secure_in_network[connection]:
+
+                if self.ack_received.get(connection):
+                    self.ack_received[connection] = False
+
+                self.ack_received[connection] = False
+                self.secure_in_network[connection] = True
+
                 if self.udp:  # on udp
                     self.channel.sendto(data, connection)
                 else:  # on snake_channel
                     self.send_channel(data, connection)
+
+                self.ack_timer.activate(0)
+
+            elif self.secure_in_network[connection] and not self.ack_received[connection]:
+                # RE-send SECURE
+                # If we didn't received ack for secure message, resend the message
+                if self.ack_timer.expired():
+                    data, connection = self.buffer_secure[0]
+
+                    if self.udp:  # on udp
+                        self.channel.sendto(data, connection)
+                    else:  # on snake_channel
+                        self.send_channel(data, connection)
         else:
             # Send NORMAL
             data, connection = self.buffer_normal.pop(0)
+
             if self.udp:  # on udp
                 self.channel.sendto(data, connection)
             else:  # on snake_channel
@@ -87,21 +99,25 @@ class SnakePost(SnakeChannel):
         else:  # on snake_channel
             data, conn = self.receive_channel()
 
-        seq_number = struct.unpack('>I', data[:4])[0]
-        ack_number = struct.unpack('>I', data[:4])[0]
+        if data is not None:
+            seq_number = struct.unpack('>I', data[:4])[0]
+            ack_number = struct.unpack('>I', data[:4])[0]
 
-        # SECURE - needs ack
-        if seq_number != 0 and ack_number == 0:
-            self.ack(seq_number, conn)
+            # SECURE - needs ack
+            if seq_number != 0 and ack_number == 0:
+                self.ack(seq_number, conn)
 
-        # If we receive an ack
-        if ack_number != 0 and seq_number == 0:
-            # Compare the ack_number with the current seq_number
-            if ack_number == self.current_seq_number:
-                # If the ack is correct, remove the secure message from the list
-                self.buffer_secure.pop(0)
-                self.secure_in_network = False
-                self.ack_received = True
-                pass
+            # If we receive an ack
+            if ack_number != 0 and seq_number == 0:
+                # Compare the ack_number with the current seq_number
+                if ack_number == self.current_seq_number:
+                    # If the ack is correct, remove the secure message from the list
+                    self.buffer_secure.pop(0)
+                    self.secure_in_network = False
+                    self.ack_received = True
+                    pass
 
-        return data[8:]  # Return the payload
+            return data[8:]  # Return the payload
+
+        else:
+            return None
