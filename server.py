@@ -25,6 +25,7 @@ class Server(SnakePost):
         self.port = port                    # Port of server
         self.channel.setblocking(False)     # Non-blocking
         self.channel.bind((self.ip, self.port))
+        pygame.init()
         self.clock = pygame.time.Clock()
         self.current_time = 0
         self.send_timer = Timer(SEND_INTERVAL, 0, True)
@@ -42,7 +43,9 @@ class Server(SnakePost):
             # Broadcast new apple secure
             if self.send_timer.expired(self.current_time):
                 for c in self.connections:
-                    self.send("kikoo", c)
+                    if self.is_connected(c):
+                        print "[Server] Send kikoo"
+                        self.send("kikoo", c)
 
             self.process_buffer()
 

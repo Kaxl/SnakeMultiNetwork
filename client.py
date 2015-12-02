@@ -26,17 +26,20 @@ class Client(SnakePost):
         self.ip = ip                    # IP of client
         self.port = int(port)           # Port of client
         self.channel.setblocking(False)
-        #self.channel.settimeout(2)      # Timeout
+        self.channel.settimeout(2)      # Timeout
+        pygame.init()
         self.clock = pygame.time.Clock()
         self.current_time = 0
         self.connect()
+        print "Connected"
         self.send_timer = Timer(SEND_INTERVAL, 0, True)
 
     def run(self):
         while True:
-            self.current_time += self.clock.tick(60)
+            self.current_time += self.clock.tick(10)
             # Send position to the server
             if self.send_timer.expired(self.current_time):
+                print "[Client] Send position"
                 self.send("Position")
 
             data = self.receive()

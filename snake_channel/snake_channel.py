@@ -31,6 +31,7 @@ class SnakeChannel(object):
         """
         self.channel = channel
         self.connections = {}
+        self.local_seq_number = {}
         self.b = 0
 
     def listen_channel(self):
@@ -179,17 +180,16 @@ class SnakeChannel(object):
         :param connection: connection (ip, port)
         :param seq: sequence number if provided
         """
-        if self.connections.get(connection) is None:
-            self.connections[connection] = [SEQ_OUTBAND, False, 0]
+        if self.local_seq_number.get(connection) is None:
+            self.local_seq_number[connection] = SEQ_OUTBAND
 
-        # print self.connections
         if seq is None:  # Incrementation of sequence number (modulo)
-            self.connections[connection][D_SEQNUM] = (self.connections[connection][D_SEQNUM] + 1) % (0x1 << 32)
+            self.local_seq_number[connection] = (self.local_seq_number[connection] + 1) % (0x1 << 32)
         else:  # Sequence number is 0xFFFFFFFF -> connection packet
-            self.connections[connection][D_SEQNUM] = seq
+            self.local_seq_number[connection] = seq
 
         # Pack the sequence number
-        pack = struct.pack('>I', self.connections[connection][D_SEQNUM])
+        pack = struct.pack('>I', self.local_seq_number[connection])
         # Concatenation of data
         pack += data
 
@@ -215,7 +215,10 @@ class SnakeChannel(object):
             if ((seq_number == SEQ_OUTBAND) or
                     (self.connections[address][D_SEQNUM] < seq_number) or
                     (seq_number < self.connections[address][D_SEQNUM] and (self.connections[address][D_SEQNUM] - seq_number) > (1 << 31))):
+                print "IN[receive_channel] seq=", str(seq_number), "conn=", str(self.connections[address][D_SEQNUM])
                 return payload, address
+            else:
+                print "[receive_channel] seq=", str(seq_number), "conn=", str(self.connections[address][D_SEQNUM])
         except socket.error:
             #print "socket.error"
             pass
