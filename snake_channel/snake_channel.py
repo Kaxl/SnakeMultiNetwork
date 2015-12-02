@@ -179,8 +179,6 @@ class SnakeChannel(object):
         :param connection: connection (ip, port)
         :param seq: sequence number if provided
         """
-        print connection
-
         if self.connections.get(connection) is None:
             self.connections[connection] = [SEQ_OUTBAND, False, 0]
 

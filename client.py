@@ -27,8 +27,23 @@ class Client(SnakePost):
         self.port = int(port)           # Port of client
         self.channel.setblocking(False)
         #self.channel.settimeout(2)      # Timeout
-        self.connect()
         self.clock = pygame.time.Clock()
+        self.current_time = 0
+        self.connect()
+        self.send_timer = Timer(SEND_INTERVAL, 0, True)
+
+    def run(self):
+        while True:
+            self.current_time += self.clock.tick(60)
+            # Send position to the server
+            if self.send_timer.expired(self.current_time):
+                self.send("Position")
+
+            data = self.receive()
+            if data is not None:
+                print "[Client] Rcv : ", data
+
+            self.process_buffer()
 
     def hello_world_message(self):
         """Test function
@@ -39,14 +54,5 @@ class Client(SnakePost):
 
 if __name__ == "__main__":
     c = Client(port=5006)
-    while True:
-        # Send position to the server
-        c.send("Position")
-
-        c.send_post()
-        data = c.receive_post()
-        if data is not None:
-            print "Data from server : ", data
-        # Receive data from server
-        # c.receive_channel()
+    c.run()
 

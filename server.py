@@ -25,23 +25,26 @@ class Server(SnakePost):
         self.port = port                    # Port of server
         self.channel.setblocking(False)     # Non-blocking
         self.channel.bind((self.ip, self.port))
+        self.clock = pygame.time.Clock()
+        self.current_time = 0
+        self.send_timer = Timer(SEND_INTERVAL, 0, True)
         print 'Listening to port', self.port, '...'
 
     def run(self):
         while True:
+            self.current_time += self.clock.tick(60)
             data = self.listen()
             if data is not None:
-                print "Data : ", data
+                print "[Server] Rcv : ", data
                 # Process game
 
             # Broadcast data
             # Broadcast new apple secure
-            for c in self.connections:
-                self.send("OK", c)
+            if self.send_timer.expired(self.current_time):
+                for c in self.connections:
+                    self.send("kikoo", c)
 
-            self.send_post()
-
-
+            self.process_buffer()
 
 if __name__ == "__main__":
     s = Server()
