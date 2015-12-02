@@ -219,7 +219,7 @@ class SnakeChannel(object):
                     (seq_number < self.connections[address][D_SEQNUM] and (self.connections[address][D_SEQNUM] - seq_number) > (1 << 31))):
                 return payload, address
         except socket.error:
-            # print "socket.error"
+            #print "socket.error"
             pass
 
         return None, None

@@ -36,6 +36,8 @@ class Server(SnakePost):
 
             # Broadcast data
             # Broadcast new apple secure
+            for c in self.connections:
+                self.send("OK", c)
 
             self.send_post()
 

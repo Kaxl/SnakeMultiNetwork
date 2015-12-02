@@ -25,7 +25,8 @@ class Client(SnakePost):
         super(Client, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
         self.ip = ip                    # IP of client
         self.port = int(port)           # Port of client
-        self.channel.settimeout(2)      # Timeout
+        self.channel.setblocking(False)
+        #self.channel.settimeout(2)      # Timeout
         self.connect()
         self.clock = pygame.time.Clock()
 
@@ -43,6 +44,9 @@ if __name__ == "__main__":
         c.send("Position")
 
         c.send_post()
+        data = c.receive_post()
+        if data is not None:
+            print "Data from server : ", data
         # Receive data from server
         # c.receive_channel()
 

@@ -129,8 +129,8 @@ class SnakePost(SnakeChannel):
         if self.udp:  # on udp
             data, conn = self.channel.recvfrom(BUFFER_SIZE)
         else:  # on snake_channel
-            # data, conn = self.receive_channel()
-            data, conn = self.listen()
+            data, conn = self.receive_channel()
+            #data, conn = self.listen()
 
         if data is not None:
             seq_number = struct.unpack('>I', data[:4])[0]
