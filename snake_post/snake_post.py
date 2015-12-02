@@ -27,6 +27,9 @@ class SnakePost(SnakeChannel):
         # Timers
         self.ack_timer = Timer(ACK_INTERVAL, 0, True)
 
+        self.clock = pygame.time.Clock()
+        self.current_time = 0
+
     def listen(self):
         """Listen for incoming messages (server)
         if the connection is not done, handle the connection (snake channel)
@@ -54,7 +57,7 @@ class SnakePost(SnakeChannel):
         if not self.last_ack.get(connection):
             self.last_ack[connection] = None
         if not self.last_seq_number.get(connection):
-            self.last_seq_number[connection] = None
+            self.last_seq_number[connection] = []
         if not self.ack_received.get(connection):
             self.ack_received[connection] = None
         if not self.secure_in_network.get(connection):
@@ -87,8 +90,10 @@ class SnakePost(SnakeChannel):
             self.buffer_normal[connection].append((struct.pack('>2I', 0, 0) + data, connection))
             # print "[send] Not secure : Data = ", data, " - to : ", connection
         else:
+            self.last_seq_number[connection].append(random.randint(1, (1 << 32) - 1))
             self.buffer_secure[connection].append(
-                (struct.pack('>2I', random.randint(1, (1 << 32) - 1), 0) + data, connection))
+                (struct.pack('>2I', self.last_seq_number[connection][-1], 0) + data, connection))
+            print "[client] Send secure : ", str(data)
 
     def process_buffer(self):
         """Check buffer from each connection and send a message
@@ -100,14 +105,15 @@ class SnakePost(SnakeChannel):
 
         :return:
         """
+        self.current_time += self.clock.tick(FPS)
         for connection in self.connections:
             if self.secure_in_network.get(connection) and \
                     self.secure_in_network[connection] and \
                     not self.ack_received[connection] and \
-                    self.ack_timer.expired(pygame.time.Clock()):
+                    self.ack_timer.expired(self.current_time):
                 # RE-send SECURE
                 # If we didn't received ack for secure message, resend the message
-                data = self.buffer_secure[connection][0]
+                data = self.buffer_secure[connection][0][0]
 
                 if self.udp:  # on udp
                     self.channel.sendto(data, connection)
@@ -163,7 +169,7 @@ class SnakePost(SnakeChannel):
                 not self.secure_in_network[connection]:
             # Secure message
             # Set a random seq_number
-            pack = struct.pack('>II', random.randint(0, (1 << 32) - 1), seq_number)
+            pack = struct.pack('>II', self.last_seq_number[connection][0], seq_number)
             pack += self.buffer_secure[connection][0]
             self.secure_in_network[connection] = True
             self.ack_received[connection] = False
@@ -195,14 +201,21 @@ class SnakePost(SnakeChannel):
                 self.ack(seq_number, conn)
 
             # If we receive an ack
+            print "ack_number : ", str(ack_number), " seq_number ", str(seq_number)
             if ack_number != 0 and seq_number == 0:
                 # Compare the ack_number with the last seq_number
-                if ack_number == self.last_seq_number[conn]:
+                print "ack_number : ", str(ack_number), " last_seq_number ", str(self.last_seq_number[conn][0])
+                if ack_number == self.last_seq_number[conn][0]:
                     # If the ack is correct, remove the secure message from the list
                     self.buffer_secure[conn].pop(0)
+                    self.last_seq_number[conn].pop(0)
                     self.secure_in_network[conn] = False
                     self.ack_received[conn] = True
-                    pass
+                else:
+                    if self.udp:  # on udp
+                        self.channel.sendto(self.buffer_secure[conn][0][0], conn)
+                    else:  # on snake_channel
+                        self.send_channel(self.buffer_secure[conn][0][0], conn)
 
             return data[8:]  # Return the payload
         else:

@@ -35,12 +35,12 @@ class Client(SnakePost):
     def run(self):
         i = 0
         while True:
-            self.current_time += self.clock.tick(10)
+            self.current_time += self.clock.tick(FPS)
             # Send position to the server
             if self.send_timer.expired(self.current_time):
                 s = "Position" + str(i)
                 i += 1
-                self.send(s)
+                self.send(s, secure=True)
 
             data = self.receive()
             if data is not None:

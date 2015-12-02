@@ -34,7 +34,7 @@ class Server(SnakePost):
     def run(self):
         i = 0
         while True:
-            self.current_time += self.clock.tick(60)
+            self.current_time += self.clock.tick(FPS)
             data = self.listen()
             if data is not None:
                 print "[Server] Rcv : ", data
