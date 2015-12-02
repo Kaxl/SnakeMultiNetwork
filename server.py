@@ -27,23 +27,18 @@ class Server(SnakePost):
         self.channel.bind((self.ip, self.port))
         print 'Listening to port', self.port, '...'
 
+    def run(self):
         while True:
-            # data = self.listen()
-            # if data is not None:
-            #    print "Data : ", data
+            data = self.listen()
+            if data is not None:
+                print "Data : ", data
+                # Process game
 
-            data_secure = self.receive_post()
-            if data_secure is not None:
-                print "Data : ", data_secure
-                pass
-                #if data = position
-                #    broadcast position
-                #else if data = mange pomme
-                #    broacast info
+            # Broadcast data
+            # Broadcast new apple secure
 
-                #if new apple:
-                #    self.send_post()
 
 
 if __name__ == "__main__":
     s = Server()
+    s.run()

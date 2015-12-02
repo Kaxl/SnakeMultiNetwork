@@ -3,6 +3,7 @@
 
 import socket  # Import socket module
 import time
+import pygame
 
 from snake_post import *
 from constants import *
@@ -26,6 +27,7 @@ class Client(SnakePost):
         self.port = int(port)           # Port of client
         self.channel.settimeout(2)      # Timeout
         self.connect()
+        self.clock = pygame.time.Clock()
 
     def hello_world_message(self):
         """Test function
@@ -39,6 +41,10 @@ if __name__ == "__main__":
     while True:
         # Send position to the server
         c.send("Position")
+
+        if c.send_timer.expired(pygame.time.Clock()):
+            print "a"
+            c.send_post()
         # Receive data from server
         # c.receive_channel()
         c.receive_post()

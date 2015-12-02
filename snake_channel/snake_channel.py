@@ -33,7 +33,7 @@ class SnakeChannel(object):
         self.connections = {}
         self.b = 0
 
-    def listen(self):
+    def listen_channel(self):
         """Listen to clients
 
         Handle the connection and the game

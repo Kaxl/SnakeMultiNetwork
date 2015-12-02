@@ -25,7 +25,14 @@ class SnakePost(SnakeChannel):
         self.send_timer = Timer(SEND_INTERVAL, 0, True)
         self.ack_timer = Timer(ACK_INTERVAL, 0, True)
 
-        pass
+    def listen(self):
+        data, conn = self.listen_channel()
+        # If we receive some data, the client is already connected
+        if data is not None and conn is not None:
+            payload = self.process_data(data, conn)
+            return payload
+        else:
+            return None
 
     def send(self, data, connection=(IP_SERVER, PORT_SERVER), secure=False):
         if not secure:
@@ -66,7 +73,7 @@ class SnakePost(SnakeChannel):
             elif self.secure_in_network[connection] and not self.ack_received[connection]:
                 # RE-send SECURE
                 # If we didn't received ack for secure message, resend the message
-                if self.ack_timer.expired():
+                if self.ack_timer.expired(pygame.time.Clock()):
                     data, connection = self.buffer_secure[0]
 
                     if self.udp:  # on udp
@@ -96,9 +103,30 @@ class SnakePost(SnakeChannel):
         else:  # on snake_channel
             self.send_channel(pack, connection)
 
+    def process_data(self, data, conn):
+        if data is not None:
+            seq_number = struct.unpack('>I', data[:4])[0]
+            ack_number = struct.unpack('>I', data[:4])[0]
+
+            # SECURE - needs ack
+            if seq_number != 0 and ack_number == 0:
+                self.ack(seq_number, conn)
+
+            # If we receive an ack
+            if ack_number != 0 and seq_number == 0:
+                # Compare the ack_number with the current seq_number
+                if ack_number == self.current_seq_number:
+                    # If the ack is correct, remove the secure message from the list
+                    self.buffer_secure.pop(0)
+                    self.secure_in_network = False
+                    self.ack_received = True
+                    pass
+
+            return data[8:]  # Return the payload
+
     def receive_post(self):
         if self.udp:  # on udp
-            data, conn = self.channel.recvfrom()
+            data, conn = self.channel.recvfrom(BUFFER_SIZE)
         else:  # on snake_channel
             # data, conn = self.receive_channel()
             data, conn = self.listen()
