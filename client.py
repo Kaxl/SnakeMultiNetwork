@@ -42,11 +42,7 @@ if __name__ == "__main__":
         # Send position to the server
         c.send("Position")
 
-        if c.send_timer.expired(pygame.time.Clock()):
-            print "a"
-            c.send_post()
+        c.send_post()
         # Receive data from server
         # c.receive_channel()
-        c.receive_post()
-        time.sleep(2)
 

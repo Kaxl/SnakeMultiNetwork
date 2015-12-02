@@ -37,6 +37,8 @@ class Server(SnakePost):
             # Broadcast data
             # Broadcast new apple secure
 
+            self.send_post()
+
 
 
 if __name__ == "__main__":

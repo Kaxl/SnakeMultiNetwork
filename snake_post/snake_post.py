@@ -82,14 +82,15 @@ class SnakePost(SnakeChannel):
                         self.send_channel(data, connection)
         else:
             # Send NORMAL
-            data, connection = self.buffer_normal.pop(0)
-            print "[send_post] Not secure : Data = ", str(data), " - to : ", connection
+            if len(self.buffer_normal) > 0:
+                data, connection = self.buffer_normal.pop(0)
+                print "[send_post] Not secure : Data = ", str(data), " - to : ", connection
 
-            if self.udp:  # on udp
-                self.channel.sendto(data, connection)
-            else:  # on snake_channel
-                self.send_channel(data, connection)
-                print "[send_post] Sent !"
+                if self.udp:  # on udp
+                    self.channel.sendto(data, connection)
+                else:  # on snake_channel
+                    self.send_channel(data, connection)
+                    print "[send_post] Sent !"
 
     def ack(self, seq_number, connection=(IP_SERVER, PORT_SERVER)):
         pack = struct.pack('>II', 0, seq_number)
