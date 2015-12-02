@@ -25,8 +25,6 @@ class Client(SnakePost):
         super(Client, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
         self.ip = ip                    # IP of client
         self.port = int(port)           # Port of client
-        self.channel.setblocking(False)
-        self.channel.settimeout(2)      # Timeout
         pygame.init()
         self.clock = pygame.time.Clock()
         self.current_time = 0

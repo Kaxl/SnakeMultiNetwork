@@ -30,6 +30,8 @@ class SnakeChannel(object):
         :return:
         """
         self.channel = channel
+        self.channel.setblocking(False)
+        self.channel.settimeout(2)
         self.connections = {}
         self.local_seq_number = {}
         self.b = 0
@@ -101,7 +103,8 @@ class SnakeChannel(object):
                 return data, conn
 
         except socket.timeout:
-            print 'Error timeout'
+            #print 'Error timeout'
+            pass
         return None, None
 
     def connect(self):
