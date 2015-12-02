@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import struct
-
 from snake_channel import *
 from timer import *
-
 from constants import *
 
 
@@ -13,6 +11,7 @@ class SnakePost(SnakeChannel):
     """SnakePost class
 
     """
+
     def __init__(self, channel, udp=False):
         super(SnakePost, self).__init__(channel)
         self.udp = udp
@@ -86,9 +85,10 @@ class SnakePost(SnakeChannel):
         self.init_dict(connection)
         if not secure:
             self.buffer_normal[connection].append((struct.pack('>2I', 0, 0) + data, connection))
-            #print "[send] Not secure : Data = ", data, " - to : ", connection
+            # print "[send] Not secure : Data = ", data, " - to : ", connection
         else:
-            self.buffer_secure[connection].append((struct.pack('>2I', random.randint(1, (1 << 32) - 1), 0) + data, connection))
+            self.buffer_secure[connection].append(
+                (struct.pack('>2I', random.randint(1, (1 << 32) - 1), 0) + data, connection))
 
     def process_buffer(self):
         """Check buffer from each connection and send a message
@@ -140,13 +140,13 @@ class SnakePost(SnakeChannel):
                 if self.buffer_normal.get(connection) and \
                         self.buffer_normal[connection]:
                     data = self.buffer_normal[connection].pop(0)[0]
-                    #print "[send_post] Not secure : Data = ", str(data), " - to : ", connection
+                    # print "[send_post] Not secure : Data = ", str(data), " - to : ", connection
 
                     if self.udp:  # on udp
                         self.channel.sendto(data, connection)
                     else:  # on snake_channel
                         self.send_channel(data, connection)
-                        #print "[send_post] Sent !"
+                        # print "[send_post] Sent !"
 
     def ack(self, seq_number, connection=(IP_SERVER, PORT_SERVER)):
         """Send an ack
@@ -158,7 +158,17 @@ class SnakePost(SnakeChannel):
         pack = struct.pack('>II', 0, seq_number)
 
         # When sending the ack, send data with the ack, if any
-        if self.buffer_normal[connection]:
+        if self.buffer_secure.get(connection) and \
+                self.buffer_secure[connection] and \
+                not self.secure_in_network[connection]:
+            # Secure message
+            # Set a random seq_number
+            pack = struct.pack('>II', random.randint(0, (1 << 32) - 1), seq_number)
+            pack += self.buffer_secure[connection][0]
+            self.secure_in_network[connection] = True
+            self.ack_received[connection] = False
+        if self.buffer_normal.get(connection) and self.buffer_normal[connection]:
+            # Normal message
             pack += self.buffer_normal[connection].pop(0)
 
         if self.udp:  # on udp
@@ -203,11 +213,11 @@ class SnakePost(SnakeChannel):
 
         :return:
         """
-        #print "receive post init"
+        # print "receive post init"
         if self.udp:  # on udp
             data, conn = self.channel.recvfrom(BUFFER_SIZE)
         else:  # on snake_channel
-            #print "on snake channel"
+            # print "on snake channel"
             data, conn = self.receive_channel()
 
         self.init_dict(conn)

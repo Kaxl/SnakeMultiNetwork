@@ -215,10 +215,8 @@ class SnakeChannel(object):
             if ((seq_number == SEQ_OUTBAND) or
                     (self.connections[address][D_SEQNUM] < seq_number) or
                     (seq_number < self.connections[address][D_SEQNUM] and (self.connections[address][D_SEQNUM] - seq_number) > (1 << 31))):
-                print "IN[receive_channel] seq=", str(seq_number), "conn=", str(self.connections[address][D_SEQNUM])
+                self.connections[address][D_SEQNUM] = seq_number
                 return payload, address
-            else:
-                print "[receive_channel] seq=", str(seq_number), "conn=", str(self.connections[address][D_SEQNUM])
         except socket.error:
             #print "socket.error"
             pass

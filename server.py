@@ -32,6 +32,7 @@ class Server(SnakePost):
         print 'Listening to port', self.port, '...'
 
     def run(self):
+        i = 0
         while True:
             self.current_time += self.clock.tick(60)
             data = self.listen()
@@ -44,8 +45,9 @@ class Server(SnakePost):
             if self.send_timer.expired(self.current_time):
                 for c in self.connections:
                     if self.is_connected(c):
-                        print "[Server] Send kikoo"
-                        self.send("kikoo", c)
+                        s = "Hello" + str(i)
+                        i += 1
+                        self.send(s, c)
 
             self.process_buffer()
 

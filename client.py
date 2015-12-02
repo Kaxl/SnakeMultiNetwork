@@ -35,25 +35,20 @@ class Client(SnakePost):
         self.send_timer = Timer(SEND_INTERVAL, 0, True)
 
     def run(self):
+        i = 0
         while True:
             self.current_time += self.clock.tick(10)
             # Send position to the server
             if self.send_timer.expired(self.current_time):
-                print "[Client] Send position"
-                self.send("Position")
+                s = "Position" + str(i)
+                i += 1
+                self.send(s)
 
             data = self.receive()
             if data is not None:
                 print "[Client] Rcv : ", data
 
             self.process_buffer()
-
-    def hello_world_message(self):
-        """Test function
-        :return:
-        """
-        for i in range(1, 100):
-            self.send_channel(str(self.connections[(IP_SERVER, PORT_SERVER)]) + " Test - Hello World", (IP_SERVER, PORT_SERVER))
 
 if __name__ == "__main__":
     c = Client(port=5006)
