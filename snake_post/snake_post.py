@@ -35,7 +35,13 @@ class SnakePost(SnakeChannel):
         if the connection is not done, handle the connection (snake channel)
         :return:
         """
-        data, conn = self.listen_channel()
+        if self.udp:
+            try:
+                data, conn = self.channel.recvfrom(BUFFER_SIZE)
+            except socket.error:
+                return None
+        else:
+            data, conn = self.listen_channel()
         self.init_dict(conn)
         # If we receive some data, the client is already connected
         if data is not None and conn is not None:
@@ -201,10 +207,8 @@ class SnakePost(SnakeChannel):
                 self.ack(seq_number, conn)
 
             # If we receive an ack
-            print "ack_number : ", str(ack_number), " seq_number ", str(seq_number)
             if ack_number != 0 and seq_number == 0:
                 # Compare the ack_number with the last seq_number
-                print "ack_number : ", str(ack_number), " last_seq_number ", str(self.last_seq_number[conn][0])
                 if ack_number == self.last_seq_number[conn][0]:
                     # If the ack is correct, remove the secure message from the list
                     self.buffer_secure[conn].pop(0)
