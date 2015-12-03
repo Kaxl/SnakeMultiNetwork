@@ -209,19 +209,19 @@ class SnakeChannel(object):
         """
         try:
             data, address = self.channel.recvfrom(BUFFER_SIZE)
-            seq_number = struct.unpack('>I', data[:4])[0]
-            payload = data[4:]
-
-            if self.connections.get(address) is None:
-                self.connections[address] = [SEQ_OUTBAND, False, 0]
-
-            if ((seq_number == SEQ_OUTBAND) or
-                    (self.connections[address][D_SEQNUM] < seq_number) or
-                    (seq_number < self.connections[address][D_SEQNUM] and (self.connections[address][D_SEQNUM] - seq_number) > (1 << 31))):
-                self.connections[address][D_SEQNUM] = seq_number
-                return payload, address
         except socket.error:
-            #print "socket.error"
-            pass
+            return None, None
+
+        seq_number = struct.unpack('>I', data[:4])[0]
+        payload = data[4:]
+
+        if self.connections.get(address) is None:
+            self.connections[address] = [SEQ_OUTBAND, False, 0]
+
+        if ((seq_number == SEQ_OUTBAND) or
+                (self.connections[address][D_SEQNUM] < seq_number) or
+                (seq_number < self.connections[address][D_SEQNUM] and (self.connections[address][D_SEQNUM] - seq_number) > (1 << 31))):
+            self.connections[address][D_SEQNUM] = seq_number
+            return payload, address
 
         return None, None

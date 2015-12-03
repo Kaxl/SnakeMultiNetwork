@@ -5,7 +5,7 @@ from snake_post import *
 from constants import *
 
 
-class Server(SnakePost):
+class ServerUDP(SnakePost):
     """Class Server
 
     Inherits from SnakeChannel for its send and receive method.
@@ -20,22 +20,24 @@ class Server(SnakePost):
         :param port: Port of server
         :return:
         """
-        super(Server, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), True)
+        super(ServerUDP, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), True)
         self.ip = ip                        # IP of server
         self.port = port                    # Port of server
-        self.channel.setblocking(False)     # Non-blocking
         self.channel.bind((self.ip, self.port))
         pygame.init()
         self.clock = pygame.time.Clock()
         self.current_time = 0
+        self.channel.setblocking(False)
         self.send_timer = Timer(SEND_INTERVAL, 0, True)
         print 'Listening to port', self.port, '...'
 
     def run(self):
         i = 0
+        client = ('127.0.0.1', 5006)
+        self.connections[client] = []
         while True:
             self.current_time += self.clock.tick(FPS)
-            data = self.listen()
+            data = self.receive()
             if data is not None:
                 print "[Server] Rcv : ", data
                 # Process game
@@ -43,13 +45,12 @@ class Server(SnakePost):
             # Broadcast data
             # Broadcast new apple secure
             if self.send_timer.expired(self.current_time):
-                for c in self.connections:
-                    s = "Hello" + str(i)
-                    i += 1
-                    self.send(s, c)
+                s = "Hello" + str(i)
+                i += 1
+                self.send(s, client)
 
             self.process_buffer()
 
 if __name__ == "__main__":
-    s = Server()
+    s = ServerUDP(port=5005)
     s.run()

@@ -1,7 +1,6 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-import struct
 from snake_channel import *
 from timer import *
 from constants import *
@@ -9,7 +8,6 @@ from constants import *
 
 class SnakePost(SnakeChannel):
     """SnakePost class
-
     """
 
     def __init__(self, channel, udp=False):
@@ -33,15 +31,10 @@ class SnakePost(SnakeChannel):
     def listen(self):
         """Listen for incoming messages (server)
         if the connection is not done, handle the connection (snake channel)
+        In udp, you can juste use the receive method because there is no connection on the server side
         :return:
         """
-        if self.udp:
-            try:
-                data, conn = self.channel.recvfrom(BUFFER_SIZE)
-            except socket.error:
-                return None
-        else:
-            data, conn = self.listen_channel()
+        data, conn = self.listen_channel()
         self.init_dict(conn)
         # If we receive some data, the client is already connected
         if data is not None and conn is not None:
@@ -51,7 +44,7 @@ class SnakePost(SnakeChannel):
             return None
 
     def init_dict(self, connection):
-        """Initialization of dictionnaries
+        """Initialization of dictionaries
 
         :param connection: Connection to init
         :return:
@@ -96,10 +89,12 @@ class SnakePost(SnakeChannel):
             self.buffer_normal[connection].append((struct.pack('>2I', 0, 0) + data, connection))
             # print "[send] Not secure : Data = ", data, " - to : ", connection
         else:
-            self.last_seq_number[connection].append(random.randint(1, (1 << 32) - 1))
-            self.buffer_secure[connection].append(
-                (struct.pack('>2I', self.last_seq_number[connection][-1], 0) + data, connection))
-            print "[client] Send secure : ", str(data)
+            if len(self.buffer_secure[connection]) < MAX_SIZE_LIST:
+                self.last_seq_number[connection].append(random.randint(1, (1 << 32) - 1))
+                self.buffer_secure[connection].append(
+                    (struct.pack('>2I', self.last_seq_number[connection][-1], 0) + data, connection))
+            else:
+                print "Buffer secure is full, try again later."
 
     def process_buffer(self):
         """Check buffer from each connection and send a message
@@ -152,13 +147,11 @@ class SnakePost(SnakeChannel):
                 if self.buffer_normal.get(connection) and \
                         self.buffer_normal[connection]:
                     data = self.buffer_normal[connection].pop(0)[0]
-                    # print "[send_post] Not secure : Data = ", str(data), " - to : ", connection
 
                     if self.udp:  # on udp
                         self.channel.sendto(data, connection)
                     else:  # on snake_channel
                         self.send_channel(data, connection)
-                        # print "[send_post] Sent !"
 
     def ack(self, seq_number, connection=(IP_SERVER, PORT_SERVER)):
         """Send an ack
@@ -168,7 +161,6 @@ class SnakePost(SnakeChannel):
         :return:
         """
         pack = struct.pack('>II', 0, seq_number)
-
         # When sending the ack, send data with the ack, if any
         if self.buffer_secure.get(connection) and \
                 self.buffer_secure[connection] and \
@@ -176,12 +168,12 @@ class SnakePost(SnakeChannel):
             # Secure message
             # Set a random seq_number
             pack = struct.pack('>II', self.last_seq_number[connection][0], seq_number)
-            pack += self.buffer_secure[connection][0]
+            pack += self.buffer_secure[connection][0][0]
             self.secure_in_network[connection] = True
             self.ack_received[connection] = False
         if self.buffer_normal.get(connection) and self.buffer_normal[connection]:
             # Normal message
-            pack += self.buffer_normal[connection].pop(0)
+            pack += self.buffer_normal[connection].pop(0)[0]
 
         if self.udp:  # on udp
             self.channel.sendto(pack, connection)
@@ -207,7 +199,8 @@ class SnakePost(SnakeChannel):
                 self.ack(seq_number, conn)
 
             # If we receive an ack
-            if ack_number != 0 and seq_number == 0:
+            if ack_number != 0 and len(self.last_seq_number[conn]) > 0 \
+                    and (seq_number == 0 or seq_number == self.last_seq_number[conn][0]):
                 # Compare the ack_number with the last seq_number
                 if ack_number == self.last_seq_number[conn][0]:
                     # If the ack is correct, remove the secure message from the list
@@ -230,9 +223,11 @@ class SnakePost(SnakeChannel):
 
         :return:
         """
-        # print "receive post init"
         if self.udp:  # on udp
-            data, conn = self.channel.recvfrom(BUFFER_SIZE)
+            try:
+                data, conn = self.channel.recvfrom(BUFFER_SIZE)
+            except socket.error:
+                return None
         else:  # on snake_channel
             # print "on snake channel"
             data, conn = self.receive_channel()

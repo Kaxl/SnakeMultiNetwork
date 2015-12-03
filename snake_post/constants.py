@@ -2,5 +2,6 @@
 # -*- coding: utf-8 -*-
 
 SEND_INTERVAL = 70
-ACK_INTERVAL = 15
+MAX_SIZE_LIST = 64
+ACK_INTERVAL = 30
 FPS = 60
