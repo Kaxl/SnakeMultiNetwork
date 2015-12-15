@@ -10,8 +10,8 @@ class SnakePost(SnakeChannel):
     """SnakePost class
     """
 
-    def __init__(self, channel, udp=False):
-        super(SnakePost, self).__init__(channel)
+    def __init__(self, channel, ip, port, udp=False):
+        super(SnakePost, self).__init__(channel, ip, port)
         self.udp = udp
         # Key of dictionary is the connection, value is a list of packets to send
         self.buffer_normal = {}  # Dict to store packets to send

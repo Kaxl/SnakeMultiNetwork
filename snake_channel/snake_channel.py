@@ -23,13 +23,15 @@ class SnakeChannel(object):
 
     TODO : Do we need to have the B value for security issues ? (crypt / decrypt)
     """
-    def __init__(self, channel):
+    def __init__(self, channel, ip_server, port_server):
         """Initialization of SnakeChannel
 
         :param channel: Socket for the connection
         :return:
         """
         self.channel = channel
+        self.ip_server = ip_server
+        self.port_server = port_server
         self.channel.setblocking(False)
         self.channel.settimeout(2)
         self.connections = {}
@@ -148,7 +150,7 @@ class SnakeChannel(object):
                         state = 0
                     else:
                         b, proto_number = token[1], token[3]
-                        self.send_channel("Connect /challenge/" + str(b) + "/protocol/" + str(proto_number),
+                        self.send_channel("Connect \\challenge\\" + str(b) + "\\protocol\\" + str(proto_number),
                                           (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
                         print "OUT  - Connect /challenge/", b, "/protocol/", proto_number
                         state += 1
@@ -197,6 +199,7 @@ class SnakeChannel(object):
         pack += data
 
         # Send the message
+        print str(pack)
         self.channel.sendto(pack, connection)
 
     def receive_channel(self):
@@ -209,6 +212,7 @@ class SnakeChannel(object):
         """
         try:
             data, address = self.channel.recvfrom(BUFFER_SIZE)
+            print data
         except socket.error:
             return None, None
 
