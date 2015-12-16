@@ -23,7 +23,7 @@ class SnakeChannel(object):
 
     TODO : Do we need to have the B value for security issues ? (crypt / decrypt)
     """
-    def __init__(self, channel, ip_server, port_server):
+    def __init__(self, channel, ip_server, port_server, color='', nickname=''):
         """Initialization of SnakeChannel
 
         :param channel: Socket for the connection
@@ -36,6 +36,8 @@ class SnakeChannel(object):
         self.channel.settimeout(2)
         self.connections = {}
         self.local_seq_number = {}
+        self.color = color
+        self.nickname = nickname
         self.b = 0
 
     def listen_channel(self):
@@ -90,7 +92,9 @@ class SnakeChannel(object):
                     print "IN   - ", data
                     # Split data and get the parameters
                     token = data.split()
-                    param = token[1].split('/')
+                    param = token[1].split('\\')
+                    color = token[5]
+                    nickname = token[7]
 
                     # Check the B value
                     if len(param) < 3 or int(self.b) != int(param[2]):
@@ -100,6 +104,8 @@ class SnakeChannel(object):
                     self.send_channel("Connected " + str(self.b), conn, SEQ_OUTBAND)
                     print "OUT  - Connected ", self.b
                     self.connections[conn][D_STATUS] = True
+                    self.connections[conn][D_COLOR] = color
+                    self.connections[conn][D_NICKNAME] = nickname
             else:
                 # Client is connected, return the data
                 return data, conn
@@ -150,9 +156,11 @@ class SnakeChannel(object):
                         state = 0
                     else:
                         b, proto_number = token[1], token[3]
-                        self.send_channel("Connect \\challenge\\" + str(b) + "\\protocol\\" + str(proto_number),
+                        self.send_channel("Connect \\challenge\\" + str(b) + "\\protocol\\" + str(proto_number)
+                                          + "\\color\\" + str(self.color) + "\\nickname\\" + str(self.nickname),
                                           (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
-                        print "OUT  - Connect /challenge/", b, "/protocol/", proto_number
+                        print "OUT  - Connect \\challenge\\", b, "\\protocol\\", proto_number, "\\color\\", self.color, \
+                            "\\nickname\\", self.nickname
                         state += 1
 
                 elif state == 3:

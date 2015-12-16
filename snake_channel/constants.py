@@ -18,4 +18,6 @@ STATE_3_S = "Game"
 D_SEQNUM = 0    # Sequence number
 D_STATUS = 1    # Status (connected / not connected)
 D_LASTP = 2     # Last ping
+D_COLOR = 3     # Color of a player
+D_NICKNAME = 4  # Nickname of a player
 
