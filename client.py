@@ -42,7 +42,7 @@ class Client(SnakePost):
             if self.send_timer.expired(self.current_time):
                 s = "Position" + str(i)
                 i += 1
-                self.send(s, secure=True)
+                self.send(s, (self.ip, self.port), secure=True)
 
             data = self.receive()
             if data is not None:

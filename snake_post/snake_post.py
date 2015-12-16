@@ -70,7 +70,7 @@ class SnakePost(SnakeChannel):
         """
         return self.connections[connection][D_STATUS]
 
-    def send(self, data, connection=(IP_SERVER, PORT_SERVER), secure=False):
+    def send(self, data, connection, secure=False):
         """Add the data into the dictionary (the key is the connection)
 
         The header of snake post is add (seq_number and ack_number)
@@ -153,7 +153,7 @@ class SnakePost(SnakeChannel):
                     else:  # on snake_channel
                         self.send_channel(data, connection)
 
-    def ack(self, seq_number, connection=(IP_SERVER, PORT_SERVER)):
+    def ack(self, seq_number, connection):
         """Send an ack
 
         :param seq_number: sequence number

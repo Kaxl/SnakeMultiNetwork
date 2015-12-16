@@ -1,8 +1,8 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-IP_SERVER = "127.0.0.1"
-PORT_SERVER = 5005
+#IP_SERVER = "127.0.0.1"
+#PORT_SERVER = 5005
 #IP_SERVER = "129.194.186.177"
 #PORT_SERVER = 8080
 BUFFER_SIZE = 4096

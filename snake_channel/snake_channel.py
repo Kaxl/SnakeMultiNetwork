@@ -136,7 +136,7 @@ class SnakeChannel(object):
             try:
                 if state == 0:
                     # 1. Send <<GetToken A Snake>>
-                    self.send_channel("GetToken " + str(a) + " Snake", (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
+                    self.send_channel("GetToken " + str(a) + " Snake", (self.ip_server, self.port_server), SEQ_OUTBAND)
                     print "OUT   - GetToken ", a, " Snake"
                     state += 1
                 elif state == 1:
@@ -180,7 +180,7 @@ class SnakeChannel(object):
                 state = 0
         return
 
-    def send_channel(self, data, connection=(IP_SERVER, PORT_SERVER), seq=None):
+    def send_channel(self, data, connection, seq=None):
         """Send data with sequence number
 
         Connection as a default value (IP server and port server)
