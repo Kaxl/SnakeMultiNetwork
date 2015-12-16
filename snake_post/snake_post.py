@@ -4,6 +4,7 @@
 from snake_channel import *
 from timer import *
 from constants import *
+import pygame
 
 
 class SnakePost(SnakeChannel):

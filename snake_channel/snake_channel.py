@@ -225,7 +225,7 @@ class SnakeChannel(object):
             return None, None
 
         seq_number = struct.unpack('>I', data[:4])[0]
-        payload = data[4:]
+        payload = data
 
         if self.connections.get(address) is None:
             self.connections[address] = [SEQ_OUTBAND, False, 0, '', '']
