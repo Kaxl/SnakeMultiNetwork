@@ -20,7 +20,7 @@ class Server(SnakePost):
         :param port: Port of server
         :return:
         """
-        super(Server, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
+        super(Server, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), ip, port)
         self.ip = ip                        # IP of server
         self.port = port                    # Port of server
         self.channel.setblocking(False)     # Non-blocking

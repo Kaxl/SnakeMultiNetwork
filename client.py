@@ -51,5 +51,6 @@ class Client(SnakePost):
             self.process_buffer()
 
 if __name__ == "__main__":
-    c = Client(ip='129.194.186.177', port=8080, color="yellow", nickname="pasquier")
+    #c = Client(ip='129.194.186.177', port=8080, color="yellow", nickname="pasquier")
+    c = Client(ip=IP_SERVER, port=PORT_SERVER, color="yellow", nickname="pasquier")
     c.run()

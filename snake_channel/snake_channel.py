@@ -49,7 +49,7 @@ class SnakeChannel(object):
         Num seq = 0xFFFFFFFF
         1. Wait for <<GetToken A Snake>>
         2. Send <<Token B A ProtocoleNumber>>
-        3. Wait for <<Connect /nom_cle/val_cle/.../...>>
+        3. Wait for <<Connect \nom_cle\val_cle\...\...>>
         4. Send <<Connected B>>
 
         After the connection phase :
@@ -85,7 +85,7 @@ class SnakeChannel(object):
                     print "OUT  - Token ", self.b, " ", a, " ", PROTOCOL_NUMBER
 
                 elif state == STATE_2_S:
-                    # 3. Wait for <<Connect /challenge/B/protocol/...>>
+                    # 3. Wait for <<Connect \challenge\B/protocol\...>>
                     if data is None:
                         return None, None
 
@@ -93,8 +93,8 @@ class SnakeChannel(object):
                     # Split data and get the parameters
                     token = data.split()
                     param = token[1].split('\\')
-                    color = token[5]
-                    nickname = token[7]
+                    color = param[5]
+                    nickname = param[7]
 
                     # Check the B value
                     if len(param) < 3 or int(self.b) != int(param[2]):
@@ -158,7 +158,7 @@ class SnakeChannel(object):
                         b, proto_number = token[1], token[3]
                         self.send_channel("Connect \\challenge\\" + str(b) + "\\protocol\\" + str(proto_number)
                                           + "\\color\\" + str(self.color) + "\\nickname\\" + str(self.nickname),
-                                          (IP_SERVER, PORT_SERVER), SEQ_OUTBAND)
+                                          (self.ip_server, self.port_server), SEQ_OUTBAND)
                         print "OUT  - Connect \\challenge\\", b, "\\protocol\\", proto_number, "\\color\\", self.color, \
                             "\\nickname\\", self.nickname
                         state += 1
@@ -228,7 +228,7 @@ class SnakeChannel(object):
         payload = data[4:]
 
         if self.connections.get(address) is None:
-            self.connections[address] = [SEQ_OUTBAND, False, 0]
+            self.connections[address] = [SEQ_OUTBAND, False, 0, '', '']
 
         if ((seq_number == SEQ_OUTBAND) or
                 (self.connections[address][D_SEQNUM] < seq_number) or
