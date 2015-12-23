@@ -21,7 +21,7 @@ class Preferences(object):
         self.fullscreen=False
         sysusername = getpass.getuser() 
         # default preferences [first run or missing file]
-        self.default = {"nickname":sysusername,"color":"green","server":"127.0.0.1","port":1234} 
+        self.default = {"nickname":sysusername,"color":"green","server":"127.0.0.1","port":1234}
         
 	self.filename = Constants.PREFERENCES_FILE
         
