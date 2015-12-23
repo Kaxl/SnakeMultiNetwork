@@ -38,11 +38,11 @@ class Client(SnakePost):
         while True:
 
             self.current_time += self.clock.tick(FPS)
-            ## Send position to the server
+            # Send position to the server
             if self.send_timer.expired(self.current_time):
-                s = "Position" + str(i)
-                i += 1
-                self.send(s, (self.ip, self.port), secure=True)
+                s = "{'body_p':[ [20,10],[20,11],[20,12],[20,13] ] }"
+                # i += 1
+                self.send(s, (self.ip, self.port))
 
             data = self.receive()
             if data is not None:
@@ -51,6 +51,6 @@ class Client(SnakePost):
             self.process_buffer()
 
 if __name__ == "__main__":
-    #c = Client(ip='129.194.186.177', port=8080, color="yellow", nickname="pasquier")
-    c = Client(ip=IP_SERVER, port=PORT_SERVER, color="yellow", nickname="pasquier")
+    c = Client(ip='129.194.186.177', port=8080, color="yellow", nickname="pasquier2")
+    #c = Client(ip=IP_SERVER, port=PORT_SERVER, color="yellow", nickname="pasquier")
     c.run()

@@ -192,16 +192,18 @@ class SnakePost(SnakeChannel):
         :return:
         """
         if data is not None and len(data) >= 8:
-            seq_number = struct.unpack('>I', data[:4])[0]
-            ack_number = struct.unpack('>I', data[4:8])[0]
+            seq_number = struct.unpack('>H', data[:2])[0]
+            ack_number = struct.unpack('>H', data[2:4])[0]
+
+            print "SEQ_NUMBER : " + str(seq_number) + " - ACK_NUMBER " + str(ack_number)
 
             # SECURE - needs ack
             if seq_number != 0 and ack_number == 0:
                 self.ack(seq_number, conn)
 
             # If we receive an ack
-            if ack_number != 0 and len(self.last_seq_number[conn]) > 0 \
-                    and (seq_number == 0 or seq_number == self.last_seq_number[conn][0]):
+            if ack_number != 0 and len(self.last_seq_number[conn]) > 0:
+                    # and (seq_number == 0 or seq_number == self.last_seq_number[conn][0]):
                 # Compare the ack_number with the last seq_number
                 if ack_number == self.last_seq_number[conn][0]:
                     # If the ack is correct, remove the secure message from the list
@@ -209,13 +211,18 @@ class SnakePost(SnakeChannel):
                     self.last_seq_number[conn].pop(0)
                     self.secure_in_network[conn] = False
                     self.ack_received[conn] = True
+                    if seq_number != 0:
+                        self.ack(seq_number, conn)
                 else:
                     if self.udp:  # on udp
                         self.channel.sendto(self.buffer_secure[conn][0][0], conn)
                     else:  # on snake_channel
                         self.send_channel(self.buffer_secure[conn][0][0], conn)
 
-            return data[8:]  # Return the payload
+            if len(data[4:]) == 0:
+                return None
+            else:
+                return data[4:]  # Return the payload
         else:
             return None
 

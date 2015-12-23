@@ -33,7 +33,7 @@ class SnakeChannel(object):
         self.ip_server = ip_server
         self.port_server = port_server
         self.channel.setblocking(False)
-        self.channel.settimeout(2)
+        self.channel.settimeout(0.1)
         self.connections = {}
         self.local_seq_number = {}
         self.color = color
@@ -207,7 +207,7 @@ class SnakeChannel(object):
         pack += data
 
         # Send the message
-        print str(pack)
+        # print str(pack)
         self.channel.sendto(pack, connection)
 
     def receive_channel(self):
@@ -220,13 +220,13 @@ class SnakeChannel(object):
         """
         try:
             data, address = self.channel.recvfrom(BUFFER_SIZE)
-            print data
+            # print data
         except socket.error:
             return None, None
 
         try:
             seq_number = struct.unpack('>I', data[:4])[0]
-            payload = data
+            payload = data[4:]
 
             if self.connections.get(address) is None:
                 self.connections[address] = [SEQ_OUTBAND, False, 0, '', '']

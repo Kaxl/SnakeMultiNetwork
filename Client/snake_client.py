@@ -102,9 +102,9 @@ class Game(SnakePost):
             # Receive data
             data = self.receive()
             if data is not None:
-                print "[Client] Rcv : ", data
+                # print "[Client] Rcv : ", data
                 data_json = json.loads(data)
-                print data_json
+                # print data_json
                 for key in data_json:
                     if key == 'foods':
                         print "foods"
@@ -141,6 +141,9 @@ class Game(SnakePost):
             # the server
             if self.move_snake_timer.expired(self.current_time):
                 self.me.move()
+                s = "{'body_p':" + str(self.me.body) + " }"
+                print s
+                self.send(s, (Constants.IP_SERVER, Constants.PORT_SERVER), secure=False)
 
             # check if we need to blink the unready snakes (unready state)
             if self.blink_snake_timer.expired(self.current_time):
@@ -176,4 +179,4 @@ class Game(SnakePost):
 
 
 if __name__ == "__main__":
-    Game(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "pasquier").run()
+    Game(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "pasquier2").run()
