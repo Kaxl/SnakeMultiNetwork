@@ -122,7 +122,8 @@ class Game(SnakePost):
                         print "foods"
                     elif key == 'snakes':
                         for value in data_json[key]:
-                            self.snakes[value[0]].setBody(value[1])
+                            if self.snakes.get(value[0]):
+                                self.snakes[value[0]].setBody(value[1])
                         print "snakes"
                     elif key == 'players_info':
 
@@ -133,9 +134,9 @@ class Game(SnakePost):
                                 if player_info[0] == name:
                                     found = True
 
-                                if not found:
-                                    del self.snakes[name]
-                                    self.scores.del_score(name)
+                            if not found:
+                                del self.snakes[name]
+                                self.scores.del_score(name)
 
                         # Parse the players_info
                         for player_info in data_json[key]:
@@ -147,6 +148,10 @@ class Game(SnakePost):
 
                             # Player is already connected, updating his scores
                             else:
+                                # Set ready
+                                if player_info[3]:
+                                    self.snakes[player_info[0]].set_ready()
+                                # Set the scores
                                 self.scores.set_score(player_info[0], player_info[2])
 
                         print "players info"
@@ -156,11 +161,10 @@ class Game(SnakePost):
                         print "game_over"
                     elif key == 'grow':
                         # If client is concerned, increment its size
-                        if data_json[key] == self.nickname:
-                            self.me.grow(Constants.GROW)
+                        if data_json[data_json[key]] == self.nickname:
+                            self.snakes[data_json[key]].grow(Constants.GROW)
                         print "grow"
                     break
-
 
             # time tracking
             self.current_time += self.clock.tick(Constants.FPS)
@@ -185,7 +189,8 @@ class Game(SnakePost):
 
             # check if we need to blink the unready snakes (unready state)
             if self.blink_snake_timer.expired(self.current_time):
-                self.me.blink()
+                for snake in self.snakes:
+                    self.snakes[snake].blink()
 
             # check if snake has eaten
             if self.me.ready:
@@ -201,7 +206,8 @@ class Game(SnakePost):
 
             # draw all snakes positions as last seen by the server
             # we do not compute their positions ourselves!
-            self.me.draw(self.gamescreen)
+            for snake in self.snakes:
+                self.snakes[snake].draw(self.gamescreen)
 
             # draw food
             self.f.draw(self.gamescreen)
@@ -217,4 +223,4 @@ class Game(SnakePost):
 
 
 if __name__ == "__main__":
-    Game(Constants.IP_SERVER, Constants.PORT_SERVER, "red", "pasquier11").run()
+    Game(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "tinder_guy").run()
