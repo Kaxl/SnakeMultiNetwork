@@ -137,7 +137,6 @@ class Game(SnakePost):
                         # Update the score on gui
                         print self.players_info
                         for s in self.players_info:
-                            print s
                             # If player already have a score, update it, else create a new score
                             if self.players_info[s][Constants.D_SCORE]:
                                 self.scores.set_score(s, self.players_info[s][Constants.D_SCORE])
