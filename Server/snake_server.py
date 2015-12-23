@@ -24,6 +24,11 @@ class SnakeServer(SnakePost):
         self.current_time = 0
         self.send_timer = Timer(SEND_INTERVAL, 0, True)
 
+        self.ip = Constants.IP_SERVER
+        self.port = Constants.PORT_SERVER
+        self.channel.setblocking(False)     # Non-blocking
+        self.channel.bind((self.ip, self.port))
+
         # Dict of Player object
         # Key is the connection, value if a player object
         self.players = {}
@@ -47,6 +52,8 @@ class SnakeServer(SnakePost):
 
             # Receive data
             data, conn = self.listen()
+            if data is not None:
+                print data
 
             # Check if new connection
             if data is not None and not self.players.get(conn):
