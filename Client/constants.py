@@ -9,6 +9,11 @@ import os
 class Constants:
     """ All of the in-game constants are declared here."""
 
+    # Constants for index of list
+    D_COLOR = 0
+    D_SCORE = 1
+    D_READY = 2
+
     # Info server
     IP_SERVER = "129.194.186.177"
     PORT_SERVER = 8080
