@@ -161,14 +161,15 @@ class SnakePost(SnakeChannel):
         :param connection: destination
         :return:
         """
-        pack = struct.pack('>II', 0, seq_number)
+        print "Sends an ack"
+        pack = struct.pack('>HH', 0, seq_number)
         # When sending the ack, send data with the ack, if any
         if self.buffer_secure.get(connection) and \
                 self.buffer_secure[connection] and \
                 not self.secure_in_network[connection]:
             # Secure message
             # Set a random seq_number
-            pack = struct.pack('>II', self.last_seq_number[connection][0], seq_number)
+            pack = struct.pack('>HH', self.last_seq_number[connection][0], seq_number)
             pack += self.buffer_secure[connection][0][0]
             self.secure_in_network[connection] = True
             self.ack_received[connection] = False
@@ -191,7 +192,7 @@ class SnakePost(SnakeChannel):
         :param conn: sender
         :return:
         """
-        if data is not None and len(data) >= 8:
+        if data is not None and len(data) >= 4:
             seq_number = struct.unpack('>H', data[:2])[0]
             ack_number = struct.unpack('>H', data[2:4])[0]
 

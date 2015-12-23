@@ -92,7 +92,7 @@ class Game(SnakePost):
                 if event.key == pygame.K_RIGHT:
                     self.me.action(4)
                 if event.key == pygame.K_SPACE:
-                    self.send("{'ready': True}", (self.ip, self.port), True)
+                    self.send("{'ready': true }", (self.ip, self.port), True)
                     self.me.set_ready()
 
     def run(self):
@@ -104,7 +104,7 @@ class Game(SnakePost):
             if data is not None:
                 # print "[Client] Rcv : ", data
                 data_json = json.loads(data)
-                # print data_json
+                print data_json
                 for key in data_json:
                     if key == 'foods':
                         print "foods"
@@ -142,7 +142,7 @@ class Game(SnakePost):
             if self.move_snake_timer.expired(self.current_time):
                 self.me.move()
                 s = "{'body_p':" + str(self.me.body) + " }"
-                print s
+                # print s
                 self.send(s, (Constants.IP_SERVER, Constants.PORT_SERVER), secure=False)
 
             # check if we need to blink the unready snakes (unready state)
@@ -179,4 +179,4 @@ class Game(SnakePost):
 
 
 if __name__ == "__main__":
-    Game(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "pasquier2").run()
+    Game(Constants.IP_SERVER, Constants.PORT_SERVER, "yellow", "pasquier").run()
