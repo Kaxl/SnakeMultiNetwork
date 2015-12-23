@@ -14,9 +14,9 @@ from constants import *
 import json
 
 
-class Game(SnakePost):
+class SnakeClient(SnakePost):
     def __init__(self, ip, port, color, nickname):
-        super(Game, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), ip, port, color, nickname)
+        super(SnakeClient, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), ip, port, color, nickname)
         self.ip = ip  # IP of client
         self.port = int(port)  # Port of client
 
@@ -222,4 +222,5 @@ class Game(SnakePost):
 
 
 if __name__ == "__main__":
-    Game(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "tinder_guy").run()
+    #SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "tinder_guy").run()
+    SnakeClient("localhost", Constants.PORT_SERVER, "green", "tinder_guy").run()

@@ -38,12 +38,10 @@ class SnakeServer(SnakePost):
         self.new_apple_timer = Timer(Constants.NEW_APPLE_PERIOD * 1000, self.current_time, periodic=True)
         self.send_snakes_timer = Timer(Constants.SNAKES_PERIOD * 1000, self.current_time, periodic=True)
         self.check_activity_timer = Timer(Constants.ACTIVITY_PERIOD * 1000, self.current_time, periodic=True)
+        print "Server initialized"
 
     def run(self):
-
-        self.running = True
-        while self.running:
-
+        while True:
             # Process message to send
             self.process_buffer()
 
@@ -51,7 +49,7 @@ class SnakeServer(SnakePost):
             data, conn = self.listen()
 
             # Check if new connection
-            if not self.players.get(conn):
+            if data is not None and not self.players.get(conn):
                 self.players[conn] = Player(self.connections[conn][D_NICKNAME], self.connections[conn][D_COLOR], 0,
                                             False, [])
                 # Send "players_info" to players
@@ -125,7 +123,7 @@ class SnakeServer(SnakePost):
                 del self.players[key]
 
             # Check if we need to send snakes positions
-            if self.send_snakes_timer.expired(self.buffer_secure):
+            if self.send_snakes_timer.expired(self.current_time):
                 self.broadcast(self.create_msg("snakes"), False)
 
     def create_msg(self, type, player=None):
@@ -172,4 +170,4 @@ class SnakeServer(SnakePost):
 
 
 if __name__ == "__main__":
-    Game(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "tinder_guy").run()
+    SnakeServer().run()
