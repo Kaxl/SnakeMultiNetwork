@@ -40,9 +40,9 @@ class SnakePost(SnakeChannel):
         # If we receive some data, the client is already connected
         if data is not None and conn is not None:
             payload = self.process_data(data, conn)
-            return payload
+            return payload, conn
         else:
-            return None
+            return None, None
 
     def init_dict(self, connection):
         """Initialization of dictionaries

@@ -1,3 +1,4 @@
+#!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
 import pygame
@@ -25,8 +26,6 @@ class Game(SnakePost):
         self.connect()
         print "Connected"
         self.send_timer = Timer(SEND_INTERVAL, 0, True)
-
-        pygame.init()
 
         # get preferences
         self.preferences = Preferences()
