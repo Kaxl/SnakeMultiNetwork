@@ -87,13 +87,13 @@ class SnakePost(SnakeChannel):
         """
         self.init_dict(connection)
         if not secure:
-            self.buffer_normal[connection].append((struct.pack('>2I', 0, 0) + data, connection))
+            self.buffer_normal[connection].append((struct.pack('>2H', 0, 0) + data, connection))
             # print "[send] Not secure : Data = ", data, " - to : ", connection
         else:
             if len(self.buffer_secure[connection]) < MAX_SIZE_LIST:
-                self.last_seq_number[connection].append(random.randint(1, (1 << 32) - 1))
+                self.last_seq_number[connection].append(random.randint(1, (1 << 16) - 1))
                 self.buffer_secure[connection].append(
-                    (struct.pack('>2I', self.last_seq_number[connection][-1], 0) + data, connection))
+                    (struct.pack('>2H', self.last_seq_number[connection][-1], 0) + data, connection))
             else:
                 print "Buffer secure is full, try again later."
 
@@ -162,14 +162,14 @@ class SnakePost(SnakeChannel):
         :return:
         """
         print "Sends an ack"
-        pack = struct.pack('>HH', 0, seq_number)
+        pack = struct.pack('>2H', 0, seq_number)
         # When sending the ack, send data with the ack, if any
         if self.buffer_secure.get(connection) and \
                 self.buffer_secure[connection] and \
                 not self.secure_in_network[connection]:
             # Secure message
             # Set a random seq_number
-            pack = struct.pack('>HH', self.last_seq_number[connection][0], seq_number)
+            pack = struct.pack('>2H', self.last_seq_number[connection][0], seq_number)
             pack += self.buffer_secure[connection][0][0]
             self.secure_in_network[connection] = True
             self.ack_received[connection] = False

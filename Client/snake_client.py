@@ -92,13 +92,17 @@ class Game(SnakePost):
                 if event.key == pygame.K_RIGHT:
                     self.me.action(4)
                 if event.key == pygame.K_SPACE:
-                    self.send("{'ready': true }", (self.ip, self.port), True)
+                    self.send("{\'ready\': true }", (self.ip, self.port), True)
                     self.me.set_ready()
 
     def run(self):
         whole_second = 0
         self.running = True
         while self.running:
+
+            # Process data to send
+            self.process_buffer()
+
             # Receive data
             data = self.receive()
             if data is not None:
@@ -107,22 +111,31 @@ class Game(SnakePost):
                 print data_json
                 for key in data_json:
                     if key == 'foods':
+                        # Update the list of apples
+                        self.f.set_positions(data_json[key])
                         print "foods"
-                    elif key == 'body_p':
-                        print "body"
                     elif key == 'snakes':
+                        # Update position of each clients (including himself)
+                        #for name in data_json[key]:
+                            # Draw each snakes
+
                         print "snakes"
                     elif key == 'players_info':
+                        # Update name of player, colors and ready state of players
+
+                        # Update the score on gui
                         print "players info"
                     elif key == 'game_over':
+                        # Decrement score of player by 1
+                        # Start the game at the start
                         print "game_over"
                     elif key == 'grow':
+                        # If client is concerned, increment its size
+                        if data_json[key] == self.nickname:
+                            self.me.grow(Constants.GROW)
                         print "grow"
-                    elif key == 'ready':
-                        print "ready"
                     break
 
-                # print data_json['players_info']
 
             # time tracking
             self.current_time += self.clock.tick(Constants.FPS)
@@ -141,7 +154,7 @@ class Game(SnakePost):
             # the server
             if self.move_snake_timer.expired(self.current_time):
                 self.me.move()
-                s = "{'body_p':" + str(self.me.body) + " }"
+                s = "{\'body_p\':" + str(self.me.body) + " }"
                 # print s
                 self.send(s, (Constants.IP_SERVER, Constants.PORT_SERVER), secure=False)
 
@@ -166,7 +179,7 @@ class Game(SnakePost):
             self.me.draw(self.gamescreen)
 
             # draw food
-            #self.f.draw(self.gamescreen)
+            self.f.draw(self.gamescreen)
 
             # process external events (keyboard,...)
             self.process_events()
