@@ -87,13 +87,14 @@ class SnakePost(SnakeChannel):
         """
         self.init_dict(connection)
         if not secure:
-            self.buffer_normal[connection].append((struct.pack('>2I', 0, 0) + data, connection))
+            self.buffer_normal[connection].append((struct.pack('>2H', 0, 0) + data, connection))
             # print "[send] Not secure : Data = ", data, " - to : ", connection
         else:
             if len(self.buffer_secure[connection]) < MAX_SIZE_LIST:
-                self.last_seq_number[connection].append(random.randint(1, (1 << 32) - 1))
+                self.last_seq_number[connection].append(random.randint(1, (1 << 16) - 1))
                 self.buffer_secure[connection].append(
-                    (struct.pack('>2I', self.last_seq_number[connection][-1], 0) + data, connection))
+                    (struct.pack('>2H', self.last_seq_number[connection][-1], 0) + data, connection))
+                print "SEQ_NUMBER : " + str(self.last_seq_number[connection][-1]) + " - ACK_NUMBER " + str(0)
             else:
                 print "Buffer secure is full, try again later."
 
@@ -139,6 +140,7 @@ class SnakePost(SnakeChannel):
                         self.channel.sendto(data, connection)
                     else:  # on snake_channel
                         self.send_channel(data, connection)
+                        print data
 
                     # Activate the timer in order to resend the message if it expires
                     self.ack_timer.activate(0)
@@ -153,6 +155,7 @@ class SnakePost(SnakeChannel):
                         self.channel.sendto(data, connection)
                     else:  # on snake_channel
                         self.send_channel(data, connection)
+                        # print data
 
     def ack(self, seq_number, connection):
         """Send an ack
@@ -161,15 +164,14 @@ class SnakePost(SnakeChannel):
         :param connection: destination
         :return:
         """
-        print "Sends an ack"
-        pack = struct.pack('>HH', 0, seq_number)
+        pack = struct.pack('>2H', 0, seq_number)
         # When sending the ack, send data with the ack, if any
         if self.buffer_secure.get(connection) and \
                 self.buffer_secure[connection] and \
                 not self.secure_in_network[connection]:
             # Secure message
             # Set a random seq_number
-            pack = struct.pack('>HH', self.last_seq_number[connection][0], seq_number)
+            pack = struct.pack('>2H', self.last_seq_number[connection][0], seq_number)
             pack += self.buffer_secure[connection][0][0]
             self.secure_in_network[connection] = True
             self.ack_received[connection] = False
@@ -181,6 +183,7 @@ class SnakePost(SnakeChannel):
             self.channel.sendto(pack, connection)
         else:  # on snake_channel
             self.send_channel(pack, connection)
+            print "ack sent"
 
     def process_data(self, data, conn):
         """Process the data we receive
@@ -192,6 +195,7 @@ class SnakePost(SnakeChannel):
         :param conn: sender
         :return:
         """
+        # print "process_data"
         if data is not None and len(data) >= 4:
             seq_number = struct.unpack('>H', data[:2])[0]
             ack_number = struct.unpack('>H', data[2:4])[0]

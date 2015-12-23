@@ -92,13 +92,16 @@ class Game(SnakePost):
                 if event.key == pygame.K_RIGHT:
                     self.me.action(4)
                 if event.key == pygame.K_SPACE:
-                    self.send("{'ready': true }", (self.ip, self.port), True)
+                    self.send("{\"ready\": true }", (self.ip, self.port), True)
                     self.me.set_ready()
 
     def run(self):
         whole_second = 0
         self.running = True
         while self.running:
+
+            self.process_buffer()
+
             # Receive data
             data = self.receive()
             if data is not None:
@@ -141,7 +144,7 @@ class Game(SnakePost):
             # the server
             if self.move_snake_timer.expired(self.current_time):
                 self.me.move()
-                s = "{'body_p':" + str(self.me.body) + " }"
+                s = "{\"body_p\":" + str(self.me.body) + " }"
                 # print s
                 self.send(s, (Constants.IP_SERVER, Constants.PORT_SERVER), secure=False)
 
