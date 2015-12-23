@@ -104,21 +104,37 @@ class Game(SnakePost):
             if data is not None:
                 print "[Client] Rcv : ", data
                 data_json = json.loads(data)
-
                 print data_json
+                for key in data_json:
+                    if key == 'foods':
+                        print "foods"
+                    elif key == 'body_p':
+                        print "body"
+                    elif key == 'snakes':
+                        print "snakes"
+                    elif key == 'players_info':
+                        print "players info"
+                    elif key == 'game_over':
+                        print "game_over"
+                    elif key == 'grow':
+                        print "grow"
+                    elif key == 'ready':
+                        print "ready"
+                    break
+
                 # print data_json['players_info']
 
             # time tracking
             self.current_time += self.clock.tick(Constants.FPS)
 
             # check if the snake is still alive
-            if not self.me.alive:
-                self.me.alive = True
-                self.me.restart()
+            #if not self.me.alive:
+            #    self.me.alive = True
+            #    self.me.restart()
 
             # check if game need more food
-            if self.new_apple_timer.expired(self.current_time):
-                self.f.make()
+            #if self.new_apple_timer.expired(self.current_time):
+            #    self.f.make()
 
             # check if we need to move our own snake's state
             # if we do, send an update of our position to
@@ -147,7 +163,7 @@ class Game(SnakePost):
             self.me.draw(self.gamescreen)
 
             # draw food
-            self.f.draw(self.gamescreen)
+            #self.f.draw(self.gamescreen)
 
             # process external events (keyboard,...)
             self.process_events()
