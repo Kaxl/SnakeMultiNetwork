@@ -157,30 +157,36 @@ class SnakeChannel(object):
                     # 3. Send <<Connect /nom_cle/val_cle/.../...>>
                     token = ack_token.split()
                     # Check if A value is correct
-                    if int(token[2]) != int(a):
+                    try:
+                        if int(token[2]) != int(a):
+                            state = 0
+                        else:
+                            self.b, proto_number = token[1], token[3]
+                            self.send_channel("Connect \\challenge\\" + str(self.b) + "\\protocol\\" + str(proto_number)
+                                              + "\\color\\" + str(self.color) + "\\nickname\\" + str(self.nickname),
+                                              (self.ip_server, self.port_server), SEQ_OUTBAND)
+                            print "OUT  - Connect \\challenge\\", self.b, "\\protocol\\", proto_number, "\\color\\", self.color, \
+                                "\\nickname\\", self.nickname
+                            state += 1
+                    except ValueError:
                         state = 0
-                    else:
-                        self.b, proto_number = token[1], token[3]
-                        self.send_channel("Connect \\challenge\\" + str(self.b) + "\\protocol\\" + str(proto_number)
-                                          + "\\color\\" + str(self.color) + "\\nickname\\" + str(self.nickname),
-                                          (self.ip_server, self.port_server), SEQ_OUTBAND)
-                        print "OUT  - Connect \\challenge\\", self.b, "\\protocol\\", proto_number, "\\color\\", self.color, \
-                            "\\nickname\\", self.nickname
-                        state += 1
 
                 elif state == 3:
                     # 4. Wait for <<Connected B>>
                     ack_connect, conn = self.receive_channel()
                     print "IN   - ", ack_connect
                     if ack_connect is None:
-                        state = 2
+                        state = 0
                     else:
                         token = ack_connect.split()
-                        # If the token is not correct, we return to state 0
-                        if int(self.b) != int(token[1]):
+                        try:
+                            # If the token is not correct, we return to state 0
+                            if int(self.b) != int(token[1]):
+                                state = 0
+                            else:
+                                state += 1
+                        except ValueError:
                             state = 0
-                        else:
-                            state += 1
                 else:
                     print "Error during connection of client."
             except socket.timeout:
