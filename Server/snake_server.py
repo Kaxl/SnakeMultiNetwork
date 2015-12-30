@@ -79,10 +79,10 @@ class SnakeServer(SnakePost):
                                     # Remove apple from the list
                                     self.foods.remove(pos)
                                     self.players[conn].score += 1
-                                    # Send list of foods
-                                    self.broadcast(self.create_msg("foods"), True)
                                     # Send "grow" message
                                     self.broadcast(self.create_msg("grow", self.players[conn].name), True)
+                                    # Send list of foods
+                                    self.broadcast(self.create_msg("foods"), True)
                                     # Resend a players_info to change the score
                                     self.broadcast(self.create_msg("players_info"))
 
@@ -96,8 +96,7 @@ class SnakeServer(SnakePost):
                                         pass
                                     else:
                                         # If a position of player is the same as the new head
-                                        if self.players[conn].positions[0] == pos:
-                                            print "GAME OVER"
+                                        if self.players[key].positions[0] == pos:
                                             # Send "game over"
                                             self.broadcast(self.create_msg("game_over", self.players[conn].name))
                                             # Decrement score of player

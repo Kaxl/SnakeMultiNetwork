@@ -74,7 +74,7 @@ class SnakeClient(SnakePost):
         self.scorescreen.fill((100, 100, 100))
 
         # timers
-        self.clock = pygame.time.Clock();
+        self.clock = pygame.time.Clock()
         self.current_time = 0
 
         self.move_snake_timer = Timer(1.0 / Constants.SNAKE_SPEED * 1000, self.current_time, periodic=True)
@@ -134,7 +134,8 @@ class SnakeClient(SnakePost):
                                     found = True
 
                             if not found:
-                                self.snakes[name].removeBody()
+                                print "NOT FOUND " + str(player_info[0])
+                                #self.snakes[name].removeBody()
                                 del self.snakes[name]
                                 self.scores.del_score(name)
 
