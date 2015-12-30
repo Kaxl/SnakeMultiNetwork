@@ -88,22 +88,22 @@ class SnakeServer(SnakePost):
 
                             # Check for collisions
                             # Loop over each players
-                            for key in self.players:
+                            for p in self.players:
                                 # Loop over each position of player
-                                for pos in self.players[conn].positions:
+                                for pos in self.players[p].positions:
                                     # Skip the head of the current player
-                                    if key == conn and pos == self.players[conn].positions[0]:
+                                    if p == conn and pos == self.players[conn].positions[0]:
                                         pass
                                     else:
                                         # If a position of player is the same as the new head
-                                        if self.players[key].positions[0] == pos:
+                                        if self.players[conn].positions[0] == pos:
                                             # Send "game over"
                                             self.broadcast(self.create_msg("game_over", self.players[conn].name))
                                             # Decrement score of player
                                             self.players[conn].score -= 1
                                             # If the player was "hit" by another player he wins 1 point
-                                            if key != conn:
-                                                self.players[key].score += 1
+                                            if p != conn:
+                                                self.players[p].score += 1
 
                                             # Change state of player to not ready
                                             self.players[conn].ready = False
