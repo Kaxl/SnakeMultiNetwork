@@ -93,8 +93,8 @@ class SnakeChannel(object):
                     # Split data and get the parameters
                     token = data.split()
                     param = token[1].split('\\')
-                    color = param[5]
-                    nickname = param[7]
+                    color = param[6]
+                    nickname = param[8]
 
                     # Check the B value
                     if len(param) < 3 or int(self.b) != int(param[2]):

@@ -15,7 +15,7 @@ class Constants:
     D_READY = 2
 
     # Info server
-    IP_SERVER = "localhost"
+    IP_SERVER = "127.0.0.1"
     PORT_SERVER = 8080
 
     # FPS

@@ -147,6 +147,9 @@ class SnakePost(SnakeChannel):
 
             else:
                 # Send NORMAL
+                print "send normal"
+                print connection
+                print self.buffer_normal.get(connection)
                 if self.buffer_normal.get(connection) and \
                         self.buffer_normal[connection]:
                     data = self.buffer_normal[connection].pop(0)[0]

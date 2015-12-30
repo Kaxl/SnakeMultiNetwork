@@ -111,7 +111,7 @@ class SnakeClient(SnakePost):
             # Receive data
             data = self.receive()
             if data is not None:
-                # print "[Client] Rcv : ", data
+                print "[Client] Rcv : ", data
                 data_json = json.loads(data)
                 print data_json
                 for key in data_json:
@@ -142,6 +142,7 @@ class SnakeClient(SnakePost):
 
                             # First time connection of a player
                             if not self.snakes.get(player_info[0]):
+                                print "player info 0 " + str(player_info[0])
                                 self.snakes[player_info[0]] = Snake(color=pygame.color.THECOLORS[player_info[1]], nickname=player_info[0])
                                 self.scores.new_score(player_info[0], self.snakes[player_info[0]].color)
 
@@ -181,6 +182,7 @@ class SnakeClient(SnakePost):
             # if we do, send an update of our position to
             # the server
             if self.move_snake_timer.expired(self.current_time):
+                print "expired move"
                 self.me.move()
                 s = "{\"body_p\":" + str(self.me.body) + " }"
                 # print s
@@ -188,6 +190,7 @@ class SnakeClient(SnakePost):
 
             # check if we need to blink the unready snakes (unready state)
             if self.blink_snake_timer.expired(self.current_time):
+                print "expired blink"
                 for snake in self.snakes:
                     self.snakes[snake].blink()
 
@@ -223,4 +226,4 @@ class SnakeClient(SnakePost):
 
 if __name__ == "__main__":
     #SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "pasquier").run()
-    SnakeClient("localhost", Constants.PORT_SERVER, "green", "tinder_guy").run()
+    SnakeClient("127.0.0.1", Constants.PORT_SERVER, "green", "tinder_guy").run()

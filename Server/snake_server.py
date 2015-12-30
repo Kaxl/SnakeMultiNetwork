@@ -88,7 +88,7 @@ class SnakeServer(SnakePost):
                         # Loop over each players
                         for key in self.players:
                             # Loop over each position of player
-                            for pos in self.players[key].position:
+                            for pos in self.players[key].positions:
                                 # Skip the head of the current player
                                 if key == conn and pos != self.players[key].positions[0]:
                                     pass
@@ -125,8 +125,11 @@ class SnakeServer(SnakePost):
 
             # Check for clients timeout
             # If timeout, removed from the dictionary
-            players_to_remove = [key for key in self.players.iteritems()
-                                 if self.players[key].timeout(self.current_time)]
+            try:
+                players_to_remove = [key for key in self.players.iteritems()
+                                     if self.players[key].timeout(self.current_time)]
+            except:
+                pass
 
             for key in players_to_remove:
                 del self.players[key]
@@ -146,22 +149,24 @@ class SnakeServer(SnakePost):
         if type == "foods":
             msg = "{\"foods\": " + str(self.foods) + "}"
         elif type == "players_info":
-            msg = "{\"players_info\": "
-            for key in self.players:
-                msg += "[" + str(self.players[key].name) + "," + str(self.players[key].color) + \
-                       "," + str(self.players[key].score) + "," + str(self.players[key].ready).lower() + "],"
-            msg = msg[:-1]
-            msg += "}"
+            msg = "{\"players_info\": ["
+            print "len " + str(len(self.players))
+            if len(self.players) > 0:
+                for key in self.players:
+                    msg += "[\"" + str(self.players[key].name) + "\",\"" + str(self.players[key].color) + \
+                           "\"," + str(self.players[key].score) + "," + str(self.players[key].ready).lower() + "],"
+                msg = msg[:-1]
+                msg += "]}"
         elif type == "snakes":
-            msg = "{\"snakes\": "
+            msg = "{\"snakes\": ["
             for key in self.players:
-                msg += "[" + str(self.players[key].name) + "," + str(self.players[key].positions) + "],"
+                msg += "[\"" + str(self.players[key].name) + "\"," + str(self.players[key].positions) + "],"
             msg = msg[:-1]
-            msg += "}"
+            msg += "]}"
         elif type == "grow":
-            msg = "{\"grow\": " + str(player) + "}"
+            msg = "{\"grow\": \"" + str(player) + "\"}"
         elif type == "game_over":
-            msg = "{\"game_over\": " + str(player) + "}"
+            msg = "{\"game_over\": \"" + str(player) + "\"}"
         else:
             return None
         return msg

@@ -6,7 +6,9 @@ from constants import *
 class Player:
 
     def __init__(self, name, color, score, ready, positions):
+        print "name : " + str(name)
         self.name = name
+        print "color : " + str(color)
         self.color = color
         self.score = score
         self.ready = ready

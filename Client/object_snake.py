@@ -42,7 +42,7 @@ class Snake(object):
         self.length = 0
 
         #put first body block right  in the middle of the grid (0,0 is the upper left pixel)
-        self.addBody((int(0.5*Constants.UNITS),int(0.5*Constants.UNITS)))
+        self.addBody([int(0.5*Constants.UNITS),int(0.5*Constants.UNITS)])
         
         #the snake will start growing up to this value
         #we remove one as one body has been added in the constructor
@@ -61,7 +61,7 @@ class Snake(object):
         self.length = 0
 
         #put first body block right  in the middle of the grid (0,0 is the upper left pixel)
-        self.addBody((int(0.5*Constants.UNITS),int(0.5*Constants.UNITS)))
+        self.addBody([int(0.5*Constants.UNITS),int(0.5*Constants.UNITS)])
         
         #the snake will start growing up to this value
         #we remove one as one body has been added in the constructor
