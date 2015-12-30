@@ -141,6 +141,7 @@ class SnakeServer(SnakePost):
 
             for key in players_to_remove:
                 del self.players[key]
+                del self.connections[key]
 
             # Check if we need to send snakes positions
             if self.send_snakes_timer.expired(self.current_time):
