@@ -116,6 +116,8 @@ class SnakeServer(SnakePost):
                             self.broadcast(self.create_msg("players_info"), True)
                             print "ready"
                         break
+                    if self.players.get(conn):
+                        self.players[conn].last_update = self.current_time
                 except:
                     print "Exception"
                     pass
@@ -130,11 +132,8 @@ class SnakeServer(SnakePost):
 
             # Check for clients timeout
             # If timeout, removed from the dictionary
-            try:
-                players_to_remove = [key for key in self.players.iteritems()
-                                     if self.players[key].timeout(self.current_time)]
-            except:
-                pass
+            players_to_remove = [key for key in self.players
+                                 if self.players[key].timeout(self.current_time)]
 
             for key in players_to_remove:
                 del self.players[key]

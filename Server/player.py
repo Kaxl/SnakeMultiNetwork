@@ -13,12 +13,16 @@ class Player:
         self.score = score
         self.ready = ready
         self.positions = positions
-        self.last_update = ''
+        self.last_update = 0
 
     def update_activity(self, current_time):
         self.last_update = current_time
 
     def timeout(self, current_time):
+        #if abs(current_time - self.last_update) > Constants.TIMEOUT_PLAYER * 1000:
+        #    return True
+        #else:
+        #    return False
         return abs(current_time - self.last_update) > Constants.TIMEOUT_PLAYER * 1000
 
 
