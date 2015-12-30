@@ -109,73 +109,75 @@ class SnakeClient(SnakePost):
             self.process_buffer()
 
             # Receive data
-            data, conn = self.receive()
-            if data is not None:
-                print "[Client] Rcv : ", data
-                data_json = json.loads(data)
-                # print data_json
-                for key in data_json:
-                    if key == 'foods':
-                        # Update the list of apples
-                        self.f.set_positions(data_json[key])
-                        print "foods"
-                    elif key == 'snakes':
-                        for value in data_json[key]:
-                            if self.snakes.get(value[0]):
-                                self.snakes[value[0]].setBody(value[1])
-                        print "snakes"
-                    elif key == 'players_info':
+            try:
+                data, conn = self.receive()
+                if data is not None:
+                    #print "[Client] Rcv : ", data
+                    data_json = json.loads(data)
+                    print data_json
+                    for key in data_json:
+                        if key == 'foods':
+                            # Update the list of apples
+                            self.f.set_positions(data_json[key])
+                            #print "foods"
+                        elif key == 'snakes':
+                            # Find players that no longer exists
+                            # and remove them from the list
+                            for name in self.snakes.keys():
+                                found = False
+                                for data in data_json[key]:
+                                    print data[0]
+                                    if data[0] == name:
+                                        found = True
 
-                        # Find players that no longer exists
-                        for name in self.snakes.keys():
-                            found = False
+                                if not found:
+                                    self.snakes[name].removeBody()
+                                    del self.snakes[name]
+                                    self.scores.del_score(name)
+                                    del self.connections[conn]
+
+                            for value in data_json[key]:
+                                if self.snakes.get(value[0]):
+                                    self.snakes[value[0]].setBody(value[1])
+                            #print "snakes"
+                        elif key == 'players_info':
+                            # Parse the players_info
                             for player_info in data_json[key]:
-                                if player_info[0] == name:
-                                    found = True
 
-                            if not found:
-                                print "NOT FOUND ---------------------------------------------------------------------"
-                                print "NOT FOUND ---------------------------------------------------------------------"
-                                print "NOT FOUND ---------------------------------------------------------------------"
-                                print "NOT FOUND ---------------------------------------------------------------------"
-                                print "NOT FOUND ---------------------------------------------------------------------"
-                                print "NOT FOUND ---------------------------------------------------------------------"
-                                #self.snakes[name].removeBody()
-                                del self.snakes[name]
-                                self.scores.del_score(name)
-                                del self.connections[conn]
+                                # First time connection of a player
+                                if not self.snakes.get(player_info[0]):
+                                    self.snakes[player_info[0]] = Snake(color=pygame.color.THECOLORS[player_info[1]], nickname=player_info[0])
+                                    self.scores.new_score(player_info[0], self.snakes[player_info[0]].color)
 
-                        # Parse the players_info
-                        for player_info in data_json[key]:
+                                # Player is already connected, updating his scores
+                                else:
+                                    # Set ready
+                                    if player_info[3]:
+                                        self.snakes[player_info[0]].set_ready()
+                                    # Set the scores
+                                    self.scores.set_score(player_info[0], player_info[2])
 
-                            # First time connection of a player
-                            if not self.snakes.get(player_info[0]):
-                                self.snakes[player_info[0]] = Snake(color=pygame.color.THECOLORS[player_info[1]], nickname=player_info[0])
-                                self.scores.new_score(player_info[0], self.snakes[player_info[0]].color)
-
-                            # Player is already connected, updating his scores
-                            else:
-                                # Set ready
-                                if player_info[3]:
-                                    self.snakes[player_info[0]].set_ready()
-                                # Set the scores
-                                self.scores.set_score(player_info[0], player_info[2])
-
-                        print "players info"
-                    elif key == 'game_over':
-                        # Start the game at the start
-                        if data_json[key] == self.nickname:
-                            self.me.restart()
-                        print "game_over"
-                    elif key == 'grow':
-                        # If client is concerned, increment its size
-                        #self.snakes[data_json[key]].grow(Constants.GROW)
-                        #print "data_json key " + str(data_json[key])
-                        if data_json[key] == self.nickname:
-                            self.me.grow(Constants.GROW)
+                            #print "players info"
+                        elif key == 'game_over':
+                            # Start the game at the start
+                            if data_json[key] == self.nickname:
+                                self.snakes[data_json[key]].restart()
+                                self.me.restart()
+                                self.snakes[data_json[key]].ready = False
+                                self.me.ready()
+                            #print "game_over"
+                        elif key == 'grow':
+                            # If client is concerned, increment its size
                             #self.snakes[data_json[key]].grow(Constants.GROW)
-                        print "grow"
-                    break
+                            #print "data_json key " + str(data_json[key])
+                            if data_json[key] == self.nickname:
+                                self.me.grow(Constants.GROW)
+                                #self.snakes[data_json[key]].grow(Constants.GROW)
+                            #print "grow"
+                        break
+            except:
+                print "Exception client"
+                pass
 
             # time tracking
             self.current_time += self.clock.tick(Constants.FPS)

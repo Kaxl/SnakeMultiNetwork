@@ -94,7 +94,7 @@ class SnakePost(SnakeChannel):
                 self.last_seq_number[connection].append(random.randint(1, (1 << 16) - 1))
                 self.buffer_secure[connection].append(
                     (struct.pack('>2H', self.last_seq_number[connection][-1], 0) + data, connection))
-                print "SEQ_NUMBER : " + str(self.last_seq_number[connection][-1]) + " - ACK_NUMBER " + str(0)
+                #print "SEQ_NUMBER : " + str(self.last_seq_number[connection][-1]) + " - ACK_NUMBER " + str(0)
             else:
                 print "Buffer secure is full, try again later."
 
@@ -140,15 +140,12 @@ class SnakePost(SnakeChannel):
                         self.channel.sendto(data, connection)
                     else:  # on snake_channel
                         self.send_channel(data, connection)
-                        print data
 
                     # Activate the timer in order to resend the message if it expires
                     self.ack_timer.activate(0)
 
             else:
                 # Send NORMAL
-                print connection
-                print self.buffer_normal.get(connection)
                 if self.buffer_normal.get(connection) and \
                         self.buffer_normal[connection]:
                     data = self.buffer_normal[connection].pop(0)[0]
@@ -157,7 +154,6 @@ class SnakePost(SnakeChannel):
                         self.channel.sendto(data, connection)
                     else:  # on snake_channel
                         self.send_channel(data, connection)
-                        # print data
 
     def ack(self, seq_number, connection):
         """Send an ack
@@ -185,7 +181,6 @@ class SnakePost(SnakeChannel):
             self.channel.sendto(pack, connection)
         else:  # on snake_channel
             self.send_channel(pack, connection)
-            print "ack sent"
 
     def process_data(self, data, conn):
         """Process the data we receive
@@ -197,12 +192,11 @@ class SnakePost(SnakeChannel):
         :param conn: sender
         :return:
         """
-        # print "process_data"
         if data is not None and len(data) >= 4:
             seq_number = struct.unpack('>H', data[:2])[0]
             ack_number = struct.unpack('>H', data[2:4])[0]
 
-            print "SEQ_NUMBER : " + str(seq_number) + " - ACK_NUMBER " + str(ack_number)
+            #print "SEQ_NUMBER : " + str(seq_number) + " - ACK_NUMBER " + str(ack_number)
 
             # SECURE - needs ack
             if seq_number != 0 and ack_number == 0:
@@ -244,7 +238,6 @@ class SnakePost(SnakeChannel):
             except socket.error:
                 return None, None
         else:  # on snake_channel
-            # print "on snake channel"
             data, conn = self.receive_channel()
 
         self.init_dict(conn)

@@ -2,13 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pygame
-from collections import Counter
 from constants import Constants
-# from object_snake import *
-# from object_foods import *
-# from scores import *
-# from preferences import Preferences
-# from banner import *
 from timer import *
 from snake_post import *
 from constants import *
@@ -100,7 +94,8 @@ class SnakeServer(SnakePost):
                                 for pos in self.players[p].positions:
                                     # If we check the current player, check if a position if present two times
                                     if p == conn:
-                                        if Counter(self.players[conn].positions).most_common()[0][1] > 1:
+                                        print "Position : " + str(self.players[conn].positions)
+                                        if self.players[conn].positions.count(self.players[conn].positions[0]) > 1:
                                             # Send "game over"
                                             self.broadcast(self.create_msg("game_over", self.players[conn].name))
                                             # Decrement score of player
@@ -142,7 +137,7 @@ class SnakeServer(SnakePost):
                     if self.players.get(conn):
                         self.players[conn].last_update = self.current_time
                 except:
-                    print "Exception"
+                    print "Exception server"
                     pass
 
             # Time tracking
@@ -205,6 +200,7 @@ class SnakeServer(SnakePost):
         :param secure: If secure or not
         :return:
         """
+        print "Sending : " + str(msg)
         for conn in self.players:
             self.send(msg, conn, secure)
 
