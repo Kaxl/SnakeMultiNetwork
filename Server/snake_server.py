@@ -83,6 +83,8 @@ class SnakeServer(SnakePost):
                                     self.broadcast(self.create_msg("foods"), True)
                                     # Send "grow" message
                                     self.broadcast(self.create_msg("grow", self.players[conn].name), True)
+                                    # Resend a players_info to change the score
+                                    self.broadcast(self.create_msg("players_info"))
 
                             # Check for collisions
                             # Loop over each players
@@ -103,6 +105,9 @@ class SnakeServer(SnakePost):
                                             # If the player was "hit" by another player he wins 1 point
                                             if key != conn:
                                                 self.players[key].score += 1
+
+                                            # Change state of player to not ready
+                                            self.players[conn].ready = False
 
                                             # Resend a players_info to change the score
                                             self.broadcast(self.create_msg("players_info"))
