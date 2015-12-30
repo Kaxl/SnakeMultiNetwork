@@ -90,7 +90,7 @@ class SnakeServer(SnakePost):
                             # Loop over each players
                             for key in self.players:
                                 # Loop over each position of player
-                                for pos in self.players[key].positions:
+                                for pos in self.players[conn].positions:
                                     # Skip the head of the current player
                                     if key == conn and pos == self.players[conn].positions[0]:
                                         pass

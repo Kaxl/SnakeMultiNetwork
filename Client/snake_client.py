@@ -134,6 +134,7 @@ class SnakeClient(SnakePost):
                                     found = True
 
                             if not found:
+                                self.snakes[name].removeBody()
                                 del self.snakes[name]
                                 self.scores.del_score(name)
 
