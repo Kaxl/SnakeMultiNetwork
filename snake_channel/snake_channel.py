@@ -102,7 +102,7 @@ class SnakeChannel(object):
 
                     # Username already used, reject connection
                     for connection in self.connections:
-                        if connection[D_NICKNAME] == 'nickname':
+                        if self.connections[connection][D_NICKNAME] == 'nickname':
                             return None, None
 
                     # 4. Send <<Connected B>>
