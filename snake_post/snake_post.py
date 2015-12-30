@@ -39,7 +39,7 @@ class SnakePost(SnakeChannel):
         self.init_dict(conn)
         # If we receive some data, the client is already connected
         if data is not None and conn is not None:
-            payload = self.process_data(data, conn)
+            payload, conn = self.process_data(data, conn)
             return payload, conn
         else:
             return None, None
@@ -227,11 +227,11 @@ class SnakePost(SnakeChannel):
                         self.send_channel(self.buffer_secure[conn][0][0], conn)
 
             if len(data[4:]) == 0:
-                return None
+                return None, None
             else:
-                return data[4:]  # Return the payload
+                return data[4:], conn  # Return the payload
         else:
-            return None
+            return None, None
 
     def receive(self):
         """Receive messages (client part)
@@ -242,7 +242,7 @@ class SnakePost(SnakeChannel):
             try:
                 data, conn = self.channel.recvfrom(BUFFER_SIZE)
             except socket.error:
-                return None
+                return None, None
         else:  # on snake_channel
             # print "on snake channel"
             data, conn = self.receive_channel()
