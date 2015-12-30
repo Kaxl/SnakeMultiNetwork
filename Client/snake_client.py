@@ -184,7 +184,7 @@ class SnakeClient(SnakePost):
                 self.me.move()
                 s = "{\"body_p\":" + str(self.me.body) + " }"
                 # print s
-                self.send(s, (Constants.IP_SERVER, Constants.PORT_SERVER), secure=False)
+                self.send(s, (self.ip, self.port), secure=False)
 
             # check if we need to blink the unready snakes (unready state)
             if self.blink_snake_timer.expired(self.current_time):
@@ -222,5 +222,5 @@ class SnakeClient(SnakePost):
 
 
 if __name__ == "__main__":
-    #SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "tinder_guy").run()
+    #SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "pasquier").run()
     SnakeClient("localhost", Constants.PORT_SERVER, "green", "tinder_guy").run()

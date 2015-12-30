@@ -54,6 +54,8 @@ class SnakeServer(SnakePost):
             data, conn = self.listen()
             if data is not None:
                 print data
+            if conn is not None:
+                print conn
 
             # Check if new connection
             if data is not None and not self.players.get(conn):
