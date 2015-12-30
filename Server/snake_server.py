@@ -68,53 +68,60 @@ class SnakeServer(SnakePost):
                 self.send(self.create_msg("foods"), conn, True)
 
             if data is not None:
-                data_json = json.loads(data)
-                print data_json
-                for key in data_json:
-                    if key == 'body_p':
-                        # Update the position of the snake
-                        if self.players.get(conn):
-                            self.players[conn].positions = data_json[key]
+                try:
+                    data_json = json.loads(data)
+                    print data_json
+                    for key in data_json:
+                        if key == 'body_p':
+                            # Update the position of the snake
+                            if self.players.get(conn):
+                                self.players[conn].positions = data_json[key]
 
-                        # If head is on an apple
-                        for pos in self.foods:
-                            if self.players[conn].positions[0] == pos:
-                                # Send list of foods
-                                self.broadcast(self.create_msg("foods"), True)
-                                # Send "grow" message
-                                self.broadcast(self.create_msg("grow", self.players[conn].name), True)
+                            # If head is on an apple
+                            for pos in self.foods:
+                                if self.players[conn].positions[0] == pos:
+                                    # Remove apple from the list
+                                    self.foods.remove(pos)
+                                    self.players[conn].score += 1
+                                    # Send list of foods
+                                    self.broadcast(self.create_msg("foods"), True)
+                                    # Send "grow" message
+                                    self.broadcast(self.create_msg("grow", self.players[conn].name), True)
 
-                        # Check for collisions
-                        # Loop over each players
-                        for key in self.players:
-                            # Loop over each position of player
-                            for pos in self.players[key].positions:
-                                # Skip the head of the current player
-                                if key == conn and pos == self.players[conn].positions[0]:
-                                    pass
-                                else:
-                                    # If a position of player is the same as the new head
-                                    if self.players[conn].positions[0] == pos:
-                                        # Send "game over"
-                                        self.broadcast(self.create_msg("game_over", self.players[conn].name))
-                                        # Decrement score of player
-                                        self.players[conn].score -= 1
-                                        # If the player was "hit" by another player he wins 1 point
-                                        if key != conn:
-                                            self.players[key].score += 1
+                            # Check for collisions
+                            # Loop over each players
+                            for key in self.players:
+                                # Loop over each position of player
+                                for pos in self.players[key].positions:
+                                    # Skip the head of the current player
+                                    if key == conn and pos == self.players[conn].positions[0]:
+                                        pass
+                                    else:
+                                        # If a position of player is the same as the new head
+                                        if self.players[conn].positions[0] == pos:
+                                            # Send "game over"
+                                            self.broadcast(self.create_msg("game_over", self.players[conn].name))
+                                            # Decrement score of player
+                                            self.players[conn].score -= 1
+                                            # If the player was "hit" by another player he wins 1 point
+                                            if key != conn:
+                                                self.players[key].score += 1
 
-                                        # Resend a players_info to change the score
-                                        self.broadcast(self.create_msg("players_info"))
+                                            # Resend a players_info to change the score
+                                            self.broadcast(self.create_msg("players_info"))
 
-                    elif key == 'ready':
-                        # set the state of the snake as ready
-                        if self.players.get(conn):
-                            self.players[conn].ready = data_json[key]
+                        elif key == 'ready':
+                            # set the state of the snake as ready
+                            if self.players.get(conn):
+                                self.players[conn].ready = data_json[key]
 
-                        # Send "players_info" message
-                        self.broadcast(self.create_msg("players_info"), True)
-                        print "ready"
-                    break
+                            # Send "players_info" message
+                            self.broadcast(self.create_msg("players_info"), True)
+                            print "ready"
+                        break
+                except:
+                    print "Exception"
+                    pass
 
             # Time tracking
             self.current_time += self.clock.tick(Constants.FPS)
@@ -122,6 +129,7 @@ class SnakeServer(SnakePost):
             # Check if game need more food
             if self.new_apple_timer.expired(self.current_time):
                 self.foods.append([random.randint(0, Constants.UNITS - 1), random.randint(0, Constants.UNITS - 1)])
+                self.broadcast(self.create_msg("foods"), True)
 
             # Check for clients timeout
             # If timeout, removed from the dictionary
@@ -150,13 +158,11 @@ class SnakeServer(SnakePost):
             msg = "{\"foods\": " + str(self.foods) + "}"
         elif type == "players_info":
             msg = "{\"players_info\": ["
-            print "len " + str(len(self.players))
-            if len(self.players) > 0:
-                for key in self.players:
-                    msg += "[\"" + str(self.players[key].name) + "\",\"" + str(self.players[key].color) + \
-                           "\"," + str(self.players[key].score) + "," + str(self.players[key].ready).lower() + "],"
-                msg = msg[:-1]
-                msg += "]}"
+            for key in self.players:
+                msg += "[\"" + str(self.players[key].name) + "\",\"" + str(self.players[key].color) + \
+                       "\"," + str(self.players[key].score) + "," + str(self.players[key].ready).lower() + "],"
+            msg = msg[:-1]
+            msg += "]}"
         elif type == "snakes":
             msg = "{\"snakes\": ["
             for key in self.players:

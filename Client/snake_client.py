@@ -142,7 +142,6 @@ class SnakeClient(SnakePost):
 
                             # First time connection of a player
                             if not self.snakes.get(player_info[0]):
-                                print "player info 0 " + str(player_info[0])
                                 self.snakes[player_info[0]] = Snake(color=pygame.color.THECOLORS[player_info[1]], nickname=player_info[0])
                                 self.scores.new_score(player_info[0], self.snakes[player_info[0]].color)
 
@@ -161,7 +160,7 @@ class SnakeClient(SnakePost):
                         print "game_over"
                     elif key == 'grow':
                         # If client is concerned, increment its size
-                        if data_json[data_json[key]] == self.nickname:
+                        if data_json[key] == self.nickname:
                             self.snakes[data_json[key]].grow(Constants.GROW)
                         print "grow"
                     break
@@ -193,10 +192,10 @@ class SnakeClient(SnakePost):
                     self.snakes[snake].blink()
 
             # check if snake has eaten
-            if self.me.ready:
-                if self.f.check(self.me.head):
-                    self.me.grow(Constants.GROW)
-                    self.scores.inc_score(self.nickname, 1)
+            #if self.me.ready:
+                #if self.f.check(self.me.head):
+                    #self.me.grow(Constants.GROW)
+                    #self.scores.inc_score(self.nickname, 1)
 
             # cleanup background
             self.gamescreen.fill(Constants.COLOR_BG)
@@ -224,4 +223,5 @@ class SnakeClient(SnakePost):
 
 if __name__ == "__main__":
     #SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "pasquier").run()
-    SnakeClient("127.0.0.1", Constants.PORT_SERVER, "green", "tinder_guy").run()
+    #SnakeClient("127.0.0.1", Constants.PORT_SERVER, "green", "tinder_guy").run()
+    SnakeClient("192.168.1.42", 21025, "green", "tinder_guy").run()
