@@ -155,11 +155,13 @@ class SnakeClient(SnakePost):
 
                         print "players info"
                     elif key == 'game_over':
-                        # Decrement score of player by 1
                         # Start the game at the start
+                        if data_json[key] == self.nickname:
+                            self.me.restart()
                         print "game_over"
                     elif key == 'grow':
                         # If client is concerned, increment its size
+                        print "data_json key " + str(data_json[key])
                         if data_json[key] == self.nickname:
                             self.snakes[data_json[key]].grow(Constants.GROW)
                         print "grow"

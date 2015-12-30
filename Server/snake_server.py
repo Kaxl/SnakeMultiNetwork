@@ -52,10 +52,6 @@ class SnakeServer(SnakePost):
 
             # Receive data
             data, conn = self.listen()
-            if data is not None:
-                print data
-            if conn is not None:
-                print conn
 
             # Check if new connection
             if data is not None and not self.players.get(conn):
@@ -99,6 +95,7 @@ class SnakeServer(SnakePost):
                                     else:
                                         # If a position of player is the same as the new head
                                         if self.players[conn].positions[0] == pos:
+                                            print "GAME OVER"
                                             # Send "game over"
                                             self.broadcast(self.create_msg("game_over", self.players[conn].name))
                                             # Decrement score of player
