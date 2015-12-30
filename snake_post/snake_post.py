@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+
 sys.path.append('..')
 
 from snake_channel import *
@@ -98,7 +99,7 @@ class SnakePost(SnakeChannel):
                 self.last_seq_number[connection].append(random.randint(1, (1 << 16) - 1))
                 self.buffer_secure[connection].append(
                     (struct.pack('>2H', self.last_seq_number[connection][-1], 0) + data, connection))
-                #print "SEQ_NUMBER : " + str(self.last_seq_number[connection][-1]) + " - ACK_NUMBER " + str(0)
+                # print "SEQ_NUMBER : " + str(self.last_seq_number[connection][-1]) + " - ACK_NUMBER " + str(0)
             else:
                 print "Buffer secure is full, try again later."
 
@@ -200,7 +201,7 @@ class SnakePost(SnakeChannel):
             seq_number = struct.unpack('>H', data[:2])[0]
             ack_number = struct.unpack('>H', data[2:4])[0]
 
-            #print "SEQ_NUMBER : " + str(seq_number) + " - ACK_NUMBER " + str(ack_number)
+            # print "SEQ_NUMBER : " + str(seq_number) + " - ACK_NUMBER " + str(ack_number)
 
             # SECURE - needs ack
             if seq_number != 0 and ack_number == 0:
@@ -208,7 +209,7 @@ class SnakePost(SnakeChannel):
 
             # If we receive an ack
             if ack_number != 0 and len(self.last_seq_number[conn]) > 0:
-                    # and (seq_number == 0 or seq_number == self.last_seq_number[conn][0]):
+                # and (seq_number == 0 or seq_number == self.last_seq_number[conn][0]):
                 # Compare the ack_number with the last seq_number
                 if ack_number == self.last_seq_number[conn][0]:
                     # If the ack is correct, remove the secure message from the list

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+
 sys.path.append('..')
 
 from snake_post import *
@@ -21,7 +22,7 @@ class SnakeServer(SnakePost):
 
         self.ip = Constants.IP_SERVER
         self.port = Constants.PORT_SERVER
-        self.channel.setblocking(False)     # Non-blocking
+        self.channel.setblocking(False)  # Non-blocking
         self.channel.bind((self.ip, self.port))
 
         # Dict of Player object

@@ -6,6 +6,7 @@
 
 import os
 
+
 class Constants:
     """ All of the in-game constants are declared here."""
 
