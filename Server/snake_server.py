@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pygame
+from collections import Counter
 from constants import Constants
 # from object_snake import *
 # from object_foods import *
@@ -73,6 +74,10 @@ class SnakeServer(SnakePost):
                             if self.players.get(conn):
                                 self.players[conn].positions = data_json[key]
 
+                            # If player is not ready, pass
+                            if not self.players[conn].ready:
+                                continue
+
                             # If head is on an apple
                             for pos in self.foods:
                                 if self.players[conn].positions[0] == pos:
@@ -89,21 +94,35 @@ class SnakeServer(SnakePost):
                             # Check for collisions
                             # Loop over each players
                             for p in self.players:
+                                if not self.players[p].ready:
+                                    continue
                                 # Loop over each position of player
                                 for pos in self.players[p].positions:
-                                    # Skip the head of the current player
-                                    if p == conn and pos == self.players[conn].positions[0]:
-                                        pass
+                                    # If we check the current player, check if a position if present two times
+                                    if p == conn:
+                                        if Counter(self.players[conn].positions).most_common()[0][1] > 1:
+                                            # Send "game over"
+                                            self.broadcast(self.create_msg("game_over", self.players[conn].name))
+                                            # Decrement score of player
+                                            self.players[conn].score -= 1
+
+                                            # Change state of player to not ready
+                                            self.players[conn].ready = False
+
+                                            # Resend a players_info to change the score
+                                            self.broadcast(self.create_msg("players_info"))
                                     else:
                                         # If a position of player is the same as the new head
                                         if self.players[conn].positions[0] == pos:
                                             # Send "game over"
                                             self.broadcast(self.create_msg("game_over", self.players[conn].name))
-                                            # Decrement score of player
-                                            self.players[conn].score -= 1
+
                                             # If the player was "hit" by another player he wins 1 point
                                             if p != conn:
                                                 self.players[p].score += 1
+                                            else:
+                                                # Decrement score of player
+                                                self.players[conn].score -= 1
 
                                             # Change state of player to not ready
                                             self.players[conn].ready = False
