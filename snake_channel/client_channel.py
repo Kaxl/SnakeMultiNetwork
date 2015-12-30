@@ -9,7 +9,7 @@ from snake_post import *
 from constants import *
 
 
-class Client(SnakePost):
+class Client(SnakeChannel):
     """Class Client
 
     Inherits from SnakeChannel for its send and receive method.
@@ -40,17 +40,16 @@ class Client(SnakePost):
             self.current_time += self.clock.tick(FPS)
             # Send position to the server
             if self.send_timer.expired(self.current_time):
-                s = "{'body_p':[ [20,10],[20,11],[20,12],[20,13] ] }"
-                # i += 1
-                self.send(s, (self.ip, self.port))
+                #s = "{'body_p':[ [20,10],[20,11],[20,12],[20,13] ] }"
+                s = "Hello from client : " + str(i)
+                i += 1
+                self.send_channel(s, (self.ip, self.port))
 
-            data = self.receive()
+            data, conn = self.receive_channel()
             if data is not None:
                 print "[Client] Rcv : ", data
 
-            self.process_buffer()
 
 if __name__ == "__main__":
-    c = Client(ip='129.194.186.177', port=8080, color="yellow", nickname="pasquier2")
-    #c = Client(ip=IP_SERVER, port=PORT_SERVER, color="yellow", nickname="pasquier")
+    c = Client(ip=IP_SERVER, port=PORT_SERVER, color="yellow", nickname="pasquier")
     c.run()

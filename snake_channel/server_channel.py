@@ -5,7 +5,7 @@ from snake_post import *
 from constants import *
 
 
-class Server(SnakePost):
+class Server(SnakeChannel):
     """Class Server
 
     Inherits from SnakeChannel for its send and receive method.
@@ -35,21 +35,17 @@ class Server(SnakePost):
         i = 0
         while True:
             self.current_time += self.clock.tick(FPS)
-            data = self.listen()
+            data, conn = self.listen_channel()
             if data is not None:
                 print "[Server] Rcv : ", data
-                # Process game
 
             # Broadcast data
             # Broadcast new apple secure
             if self.send_timer.expired(self.current_time):
                 for c in self.connections:
-                    if self.is_connected(c):
-                        s = "Hello" + str(i)
-                        i += 1
-                        self.send(s, c)
-
-            self.process_buffer()
+                    s = "Hello from server : " + str(i)
+                    i += 1
+                    self.send_channel(s, c)
 
 if __name__ == "__main__":
     s = Server()

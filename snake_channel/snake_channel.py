@@ -160,11 +160,11 @@ class SnakeChannel(object):
                     if int(token[2]) != int(a):
                         state = 0
                     else:
-                        b, proto_number = token[1], token[3]
-                        self.send_channel("Connect \\challenge\\" + str(b) + "\\protocol\\" + str(proto_number)
+                        self.b, proto_number = token[1], token[3]
+                        self.send_channel("Connect \\challenge\\" + str(self.b) + "\\protocol\\" + str(proto_number)
                                           + "\\color\\" + str(self.color) + "\\nickname\\" + str(self.nickname),
                                           (self.ip_server, self.port_server), SEQ_OUTBAND)
-                        print "OUT  - Connect \\challenge\\", b, "\\protocol\\", proto_number, "\\color\\", self.color, \
+                        print "OUT  - Connect \\challenge\\", self.b, "\\protocol\\", proto_number, "\\color\\", self.color, \
                             "\\nickname\\", self.nickname
                         state += 1
 
@@ -176,8 +176,11 @@ class SnakeChannel(object):
                         state = 2
                     else:
                         token = ack_connect.split()
-                        self.b = token[1]
-                        state += 1
+                        # If the token is not correct, we return to state 0
+                        if int(self.b) != int(token[1]):
+                            state = 0
+                        else:
+                            state += 1
                 else:
                     print "Error during connection of client."
             except socket.timeout:
