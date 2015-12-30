@@ -35,7 +35,7 @@ class Server(SnakePost):
         i = 0
         while True:
             self.current_time += self.clock.tick(FPS)
-            data = self.listen()
+            data, conn = self.listen()
             if data is not None:
                 print "[Server] Rcv : ", data
                 # Process game
@@ -47,7 +47,7 @@ class Server(SnakePost):
                     if self.is_connected(c):
                         s = "Hello" + str(i)
                         i += 1
-                        self.send(s, c)
+                        self.send(s, c, True)
 
             self.process_buffer()
 
