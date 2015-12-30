@@ -1,10 +1,6 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-import socket  # Import socket module
-import time
-import pygame
-
 from snake_post import *
 from constants import *
 

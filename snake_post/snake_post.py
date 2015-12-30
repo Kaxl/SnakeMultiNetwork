@@ -1,6 +1,11 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.append('../snake_channel')
+sys.path.append('../timer')
+sys.path.append('../timer')
+
 from snake_channel import *
 from timer import *
 from constants import *

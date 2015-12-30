@@ -1,6 +1,10 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.append('../snake_channel')
+sys.path.append('../timer')
+
 import socket
 import struct
 import random
