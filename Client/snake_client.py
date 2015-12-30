@@ -236,5 +236,5 @@ class SnakeClient(SnakePost):
 if __name__ == "__main__":
     #SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "pasquier").run()
     #SnakeClient("127.0.0.1", Constants.PORT_SERVER, "green", "tinder_guy").run()
-    #SnakeClient("192.168.1.42", 21025, "red", "pasqueir").run()
-    SnakeClient("192.168.1.42", 21025, "yellow", "nyancat").run()
+    SnakeClient("192.168.1.42", 21025, "red", "pasqueir").run()
+    # SnakeClient("192.168.1.42", 21025, "yellow", "nyancat").run()
