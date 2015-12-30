@@ -67,3 +67,11 @@ target/
 
 *.swp
 *.dat
+
+# Doc files
+doc/rapport/*.log
+doc/rapport/*.aux
+doc/rapport/*.gz
+doc/rapport/*.pdf
+
+
