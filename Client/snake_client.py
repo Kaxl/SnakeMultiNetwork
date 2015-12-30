@@ -109,7 +109,7 @@ class SnakeClient(SnakePost):
             self.process_buffer()
 
             # Receive data
-            data = self.receive()
+            data, conn = self.receive()
             if data is not None:
                 print "[Client] Rcv : ", data
                 data_json = json.loads(data)
@@ -127,17 +127,17 @@ class SnakeClient(SnakePost):
                     elif key == 'players_info':
 
                         # Find players that no longer exists
-                        for name in self.snakes:
+                        for name in self.snakes.keys():
                             found = False
                             for player_info in data_json[key]:
                                 if player_info[0] == name:
                                     found = True
 
                             if not found:
-                                print "NOT FOUND " + str(player_info[0])
                                 #self.snakes[name].removeBody()
                                 del self.snakes[name]
                                 self.scores.del_score(name)
+                                del self.connections[conn]
 
                         # Parse the players_info
                         for player_info in data_json[key]:
