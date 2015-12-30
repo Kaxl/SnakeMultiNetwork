@@ -36,6 +36,7 @@ class SnakePost(SnakeChannel):
         :return:
         """
         data, conn = self.listen_channel()
+
         self.init_dict(conn)
         # If we receive some data, the client is already connected
         if data is not None and conn is not None:

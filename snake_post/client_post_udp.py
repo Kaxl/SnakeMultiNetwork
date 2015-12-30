@@ -18,7 +18,7 @@ class ClientUDP(SnakePost):
         :param port: Port of client
         :return:
         """
-        super(ClientUDP, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), True)
+        super(ClientUDP, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), ip, port, True)
         self.ip = ip                    # IP of client
         self.port = int(port)           # Port of client
         pygame.init()
@@ -27,6 +27,7 @@ class ClientUDP(SnakePost):
         self.channel.bind((self.ip, self.port))
         self.channel.setblocking(False)
         self.send_timer = Timer(SEND_INTERVAL, 0, True)
+        self.udp = True
 
     def run(self):
         i = 0
@@ -38,9 +39,9 @@ class ClientUDP(SnakePost):
             if self.send_timer.expired(self.current_time):
                 s = "Position" + str(i)
                 i += 1
-                self.send(s, server, True)
+                self.send(s, server, False)
 
-            data = self.receive()
+            data, conn = self.receive()
             if data is not None:
                 print "[Client] Rcv : ", data
 

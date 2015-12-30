@@ -20,7 +20,7 @@ class ServerUDP(SnakePost):
         :param port: Port of server
         :return:
         """
-        super(ServerUDP, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), True)
+        super(ServerUDP, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), ip, port, True)
         self.ip = ip                        # IP of server
         self.port = port                    # Port of server
         self.channel.bind((self.ip, self.port))
@@ -29,6 +29,7 @@ class ServerUDP(SnakePost):
         self.current_time = 0
         self.channel.setblocking(False)
         self.send_timer = Timer(SEND_INTERVAL, 0, True)
+        self.udp = True
         print 'Listening to port', self.port, '...'
 
     def run(self):
@@ -37,17 +38,16 @@ class ServerUDP(SnakePost):
         self.connections[client] = []
         while True:
             self.current_time += self.clock.tick(FPS)
-            data = self.receive()
+            data, conn = self.receive()
             if data is not None:
                 print "[Server] Rcv : ", data
                 # Process game
 
-            # Broadcast data
-            # Broadcast new apple secure
+            # Send data
             if self.send_timer.expired(self.current_time):
                 s = "Hello" + str(i)
                 i += 1
-                self.send(s, client)
+                self.send(s, client, False)
 
             self.process_buffer()
 
