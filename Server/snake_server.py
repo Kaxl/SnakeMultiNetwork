@@ -90,7 +90,7 @@ class SnakeServer(SnakePost):
                             # Loop over each position of player
                             for pos in self.players[key].positions:
                                 # Skip the head of the current player
-                                if key == conn and pos != self.players[key].positions[0]:
+                                if key == conn and pos == self.players[conn].positions[0]:
                                     pass
                                 else:
                                     # If a position of player is the same as the new head

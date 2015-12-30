@@ -182,7 +182,6 @@ class SnakeClient(SnakePost):
             # if we do, send an update of our position to
             # the server
             if self.move_snake_timer.expired(self.current_time):
-                print "expired move"
                 self.me.move()
                 s = "{\"body_p\":" + str(self.me.body) + " }"
                 # print s
@@ -190,7 +189,6 @@ class SnakeClient(SnakePost):
 
             # check if we need to blink the unready snakes (unready state)
             if self.blink_snake_timer.expired(self.current_time):
-                print "expired blink"
                 for snake in self.snakes:
                     self.snakes[snake].blink()
 
