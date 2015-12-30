@@ -94,7 +94,6 @@ class SnakeServer(SnakePost):
                                 for pos in self.players[p].positions:
                                     # If we check the current player, check if a position if present two times
                                     if p == conn:
-                                        print "Position : " + str(self.players[conn].positions)
                                         if self.players[conn].positions.count(self.players[conn].positions[0]) > 1:
                                             # Send "game over"
                                             self.broadcast(self.create_msg("game_over", self.players[conn].name))
@@ -106,6 +105,7 @@ class SnakeServer(SnakePost):
 
                                             # Resend a players_info to change the score
                                             self.broadcast(self.create_msg("players_info"))
+                                            break
                                     else:
                                         # If a position of player is the same as the new head
                                         if self.players[conn].positions[0] == pos:
@@ -124,6 +124,7 @@ class SnakeServer(SnakePost):
 
                                             # Resend a players_info to change the score
                                             self.broadcast(self.create_msg("players_info"))
+                                            break
 
                         elif key == 'ready':
                             # set the state of the snake as ready

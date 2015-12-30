@@ -165,15 +165,15 @@ class SnakeClient(SnakePost):
                                 self.me.restart()
                                 self.snakes[data_json[key]].ready = False
                                 self.me.ready()
-                            #print "game_over"
+
+                            # Set the player who had game over at not ready
+                            self.snakes[data_json[key]].ready = False
+
                         elif key == 'grow':
                             # If client is concerned, increment its size
-                            #self.snakes[data_json[key]].grow(Constants.GROW)
-                            #print "data_json key " + str(data_json[key])
                             if data_json[key] == self.nickname:
                                 self.me.grow(Constants.GROW)
                                 #self.snakes[data_json[key]].grow(Constants.GROW)
-                            #print "grow"
                         break
             except:
                 print "Exception client"
@@ -238,5 +238,5 @@ class SnakeClient(SnakePost):
 if __name__ == "__main__":
     #SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "pasquier").run()
     #SnakeClient("127.0.0.1", Constants.PORT_SERVER, "green", "tinder_guy").run()
-    SnakeClient("192.168.1.42", 21025, "red", "pasqueir").run()
-    # SnakeClient("192.168.1.42", 21025, "yellow", "nyancat").run()
+    #SnakeClient("192.168.1.42", 21025, "red", "pasqueir").run()
+    SnakeClient("192.168.1.42", 21025, "yellow", "nyancat").run()
