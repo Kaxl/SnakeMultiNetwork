@@ -20,6 +20,7 @@ class Constants:
     #PORT_SERVER = 8080
     PORT_SERVER = 21025
 
+    ACK_INTERVAL = 30
     # FPS
     FPS = 60
     UNITS = 40

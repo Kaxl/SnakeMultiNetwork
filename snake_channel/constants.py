@@ -7,6 +7,8 @@ PORT_SERVER = 5005
 BUFFER_SIZE = 4096
 PROTOCOL_NUMBER = 19
 SEQ_OUTBAND = 0xffffffff    # Message for the connection
+SEND_INTERVAL = 70
+FPS = 60
 
 # State for the server
 STATE_1_S = "GetToken"

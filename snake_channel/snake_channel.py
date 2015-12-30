@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import sys
-sys.path.append('../snake_channel')
-sys.path.append('../timer')
+
+sys.path.append('..')
 
 import socket
 import struct
@@ -27,6 +27,7 @@ class SnakeChannel(object):
 
     TODO : Do we need to have the B value for security issues ? (crypt / decrypt)
     """
+
     def __init__(self, channel, ip_server, port_server, color='', nickname=''):
         """Initialization of SnakeChannel
 
@@ -85,7 +86,8 @@ class SnakeChannel(object):
                     self.b = random.randint(0, (1 << 32) - 1)
 
                     # 2. Send <<Token B A ProtocolNumber>>
-                    self.send_channel("Token " + str(self.b) + " " + str(a) + " " + str(PROTOCOL_NUMBER), conn, SEQ_OUTBAND)
+                    self.send_channel("Token " + str(self.b) + " " + str(a) + " " + str(PROTOCOL_NUMBER), conn,
+                                      SEQ_OUTBAND)
                     print "OUT  - Token ", self.b, " ", a, " ", PROTOCOL_NUMBER
 
                 elif state == STATE_2_S:
@@ -120,7 +122,7 @@ class SnakeChannel(object):
                 return data, conn
 
         except socket.timeout:
-            #print 'Error timeout'
+            # print 'Error timeout'
             pass
         return None, None
 
@@ -251,7 +253,8 @@ class SnakeChannel(object):
 
             if ((seq_number == SEQ_OUTBAND) or
                     (self.connections[address][D_SEQNUM] < seq_number) or
-                    (seq_number < self.connections[address][D_SEQNUM] and (self.connections[address][D_SEQNUM] - seq_number) > (1 << 31))):
+                    (seq_number < self.connections[address][D_SEQNUM] and (
+                        self.connections[address][D_SEQNUM] - seq_number) > (1 << 31))):
                 self.connections[address][D_SEQNUM] = seq_number
                 return payload, address
 
@@ -260,6 +263,3 @@ class SnakeChannel(object):
         except:
             # If we receive garbage, return None
             return None, None
-
-
-

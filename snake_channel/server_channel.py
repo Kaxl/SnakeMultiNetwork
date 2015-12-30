@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import sys
-sys.path.append('../snake_post')
-sys.path.append('../timer')
+
+sys.path.append('..')
 
 from snake_post import *
 from constants import *
@@ -17,6 +17,7 @@ class Server(SnakeChannel):
     If the state is in the connection phase, we handle de connection of the client.
     If the state is already established for the client, we handle the game positions.
     """
+
     def __init__(self, ip=IP_SERVER, port=PORT_SERVER):
         """Initialization of Server class
 
@@ -25,9 +26,9 @@ class Server(SnakeChannel):
         :return:
         """
         super(Server, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), ip, port)
-        self.ip = ip                        # IP of server
-        self.port = port                    # Port of server
-        self.channel.setblocking(False)     # Non-blocking
+        self.ip = ip  # IP of server
+        self.port = port  # Port of server
+        self.channel.setblocking(False)  # Non-blocking
         self.channel.bind((self.ip, self.port))
         pygame.init()
         self.clock = pygame.time.Clock()
@@ -50,6 +51,7 @@ class Server(SnakeChannel):
                     s = "Hello from server : " + str(i)
                     i += 1
                     self.send_channel(s, c)
+
 
 if __name__ == "__main__":
     s = Server()

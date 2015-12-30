@@ -1,9 +1,9 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-import pygame
-from constants import Constants
-from timer import *
+import sys
+sys.path.append('..')
+
 from snake_post import *
 from constants import *
 import json
