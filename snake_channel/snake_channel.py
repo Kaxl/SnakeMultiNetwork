@@ -100,6 +100,11 @@ class SnakeChannel(object):
                     if len(param) < 3 or int(self.b) != int(param[2]):
                         return None, None
 
+                    # Username already used, reject connection
+                    for connection in self.connections:
+                        if connection[D_NICKNAME] == 'nickname':
+                            return None, None
+
                     # 4. Send <<Connected B>>
                     self.send_channel("Connected " + str(self.b), conn, SEQ_OUTBAND)
                     print "OUT  - Connected ", self.b
