@@ -1,5 +1,7 @@
 import pygame
+
 from constants import Constants
+
 
 class Banner(object):
         def __init__(self, unit=Constants.RESOLUTION[0]/Constants.UNITS):

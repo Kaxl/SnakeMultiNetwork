@@ -5,12 +5,9 @@
 #  Licence: MIT
 #
 
-import pygame
-import random
-import pickle
 import argparse
 import getpass
-
+import pickle
 #YASP common imports
 from constants import Constants
 

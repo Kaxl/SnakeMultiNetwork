@@ -1,0 +1,22 @@
+Axel Fahy - Rudolf Hohn
+
+
+Mettre le bon couple (ip / port) dans le fichier 'constants.py'
+(Constants.IP_SERVER et Constants.PORT)
+
+Server
+------
+
+1. Aller dans le dossier 'Server'
+2. python2 snake_server.py
+
+
+Client
+------
+
+1. Aller dans le dossier 'Client'
+2. python2 snake_client.py
+
+
+
+

@@ -5,10 +5,12 @@
 #  Licence: MIT
 #
 
-import pygame
-import random
 import json
+
+import pygame
+
 from constants import Constants
+
 
 class SnakeBlockKind:
     HEAD = 0

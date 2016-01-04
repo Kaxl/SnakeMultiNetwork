@@ -5,9 +5,12 @@
 #  Licence: MIT
 #
 
-import pygame
 import random
+
+import pygame
+
 from constants import Constants
+
 
 class Foods(object):
 

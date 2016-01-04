@@ -6,7 +6,6 @@
 #
 
 import pygame
-import random
 # YASP common imports
 from constants import Constants
 # YASP imports
