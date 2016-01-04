@@ -33,7 +33,7 @@ class SnakeServer(SnakePost):
         self.foods = []
 
         # timers
-        self.clock = pygame.time.Clock();
+        self.clock = pygame.time.Clock()
         self.current_time = 0
 
         self.new_apple_timer = Timer(Constants.NEW_APPLE_PERIOD * 1000, self.current_time, periodic=True)

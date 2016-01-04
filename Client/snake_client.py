@@ -102,7 +102,6 @@ class SnakeClient(SnakePost):
                     self.me.set_ready()
 
     def run(self):
-        whole_second = 0
         self.running = True
         while self.running:
 

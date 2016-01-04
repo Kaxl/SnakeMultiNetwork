@@ -17,5 +17,16 @@ Client
 2. python2 snake_client.py
 
 
+Perte de packet :
+
+# tc qdisc add dev wlp3s0 root netem loss 10%
+
+Suppression de la perte de packet :
+
+# tc qdisc del dev wlp3s0 root netem loss 10%
+
+Voir les propriétés de l'interface
+
+# tc qdisc show dev wlp3s0
 
 
