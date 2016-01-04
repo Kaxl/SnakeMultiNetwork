@@ -93,13 +93,11 @@ class SnakePost(SnakeChannel):
         self.init_dict(connection)
         if not secure:
             self.buffer_normal[connection].append((struct.pack('>2H', 0, 0) + data, connection))
-            # print "[send] Not secure : Data = ", data, " - to : ", connection
         else:
             if len(self.buffer_secure[connection]) < MAX_SIZE_LIST:
                 self.last_seq_number[connection].append(random.randint(1, (1 << 16) - 1))
                 self.buffer_secure[connection].append(
                     (struct.pack('>2H', self.last_seq_number[connection][-1], 0) + data, connection))
-                # print "SEQ_NUMBER : " + str(self.last_seq_number[connection][-1]) + " - ACK_NUMBER " + str(0)
             else:
                 print "Buffer secure is full, try again later."
 
@@ -201,10 +199,8 @@ class SnakePost(SnakeChannel):
             seq_number = struct.unpack('>H', data[:2])[0]
             ack_number = struct.unpack('>H', data[2:4])[0]
 
-            # print "SEQ_NUMBER : " + str(seq_number) + " - ACK_NUMBER " + str(ack_number)
-
             # SECURE - needs ack
-            if seq_number != 0 and ack_number == 0:
+            if seq_number != 0:
                 self.ack(seq_number, conn)
 
             # If we receive an ack

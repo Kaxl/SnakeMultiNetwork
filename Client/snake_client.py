@@ -120,22 +120,14 @@ class SnakeClient(SnakePost):
                         if key == 'foods':
                             # Update the list of apples
                             self.f.set_positions(data_json[key])
-                            # print "foods"
                         elif key == 'snakes':
                             # Find players that no longer exists
                             # and remove them from the list
                             for name in self.snakes.keys():
                                 found = False
                                 for data in data_json[key]:
-                                    print data[0]
                                     if data[0] == name:
                                         found = True
-
-                                if not found:
-                                    self.snakes[name].removeBody()
-                                    del self.snakes[name]
-                                    self.scores.del_score(name)
-                                    del self.connections[conn]
 
                             for value in data_json[key]:
                                 if self.snakes.get(value[0]):
@@ -159,7 +151,6 @@ class SnakeClient(SnakePost):
                                     # Set the scores
                                     self.scores.set_score(player_info[0], player_info[2])
 
-                                    # print "players info"
                         elif key == 'game_over':
                             # Start the game at the start
                             if data_json[key] == self.nickname:
@@ -199,7 +190,8 @@ class SnakeClient(SnakePost):
             if self.move_snake_timer.expired(self.current_time):
                 self.me.move()
                 s = "{\"body_p\":" + str(self.me.body) + " }"
-                # print s
+                s = self.me.netinfo()
+                print s
                 self.send(s, (self.ip, self.port), secure=False)
 
             # check if we need to blink the unready snakes (unready state)
@@ -208,10 +200,10 @@ class SnakeClient(SnakePost):
                     self.snakes[snake].blink()
 
                     # check if snake has eaten
-                    # if self.me.ready:
-                    # if self.f.check(self.me.head):
-                    # self.me.grow(Constants.GROW)
-                    # self.scores.inc_score(self.nickname, 1)
+                    #if self.me.ready:
+                    #    if self.f.check(self.me.head):
+                    #        self.me.grow(Constants.GROW)
+                    #        self.scores.inc_score(self.nickname, 1)
 
             # cleanup background
             self.gamescreen.fill(Constants.COLOR_BG)
@@ -238,8 +230,8 @@ class SnakeClient(SnakePost):
 
 
 if __name__ == "__main__":
-    #SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "pasquier").run()
-    SnakeClient(Constants.IP_SERVER, 7777, "green", "pasquier").run()
+    SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "pasquier").run()
+    #SnakeClient(Constants.IP_SERVER, 7777, "green", "pasquier").run()
     # SnakeClient("127.0.0.1", Constants.PORT_SERVER, "green", "tinder_guy").run()
     # SnakeClient("192.168.1.42", 21025, "red", "pasqueir").run()
     #SnakeClient("192.168.1.42", 21025, "yellow", "nyancat").run()
