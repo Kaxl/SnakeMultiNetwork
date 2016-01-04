@@ -16,10 +16,10 @@ class Constants:
     D_READY = 2
 
     # Info server
-    #IP_SERVER = "127.0.0.1"
-    IP_SERVER = "192.168.1.42"
-    #PORT_SERVER = 8080
-    PORT_SERVER = 21025
+    IP_SERVER = "127.0.0.1"
+    #IP_SERVER = "192.168.1.42"
+    PORT_SERVER = 8080
+    #PORT_SERVER = 21025
 
     ACK_INTERVAL = 30
     # FPS

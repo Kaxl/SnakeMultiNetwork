@@ -115,7 +115,7 @@ class SnakeClient(SnakePost):
                 if data is not None:
                     # print "[Client] Rcv : ", data
                     data_json = json.loads(data)
-                    print data_json
+                    #print data_json
                     for key in data_json:
                         if key == 'foods':
                             # Update the list of apples
@@ -128,11 +128,15 @@ class SnakeClient(SnakePost):
                                 for data in data_json[key]:
                                     if data[0] == name:
                                         found = True
+                                # Remove snake
+                                if not found:
+                                    del self.snakes[name]
+                                    self.scores.del_score(name)
 
                             for value in data_json[key]:
                                 if self.snakes.get(value[0]):
                                     self.snakes[value[0]].setBody(value[1])
-                                    # print "snakes"
+
                         elif key == 'players_info':
                             # Parse the players_info
                             for player_info in data_json[key]:
@@ -166,44 +170,25 @@ class SnakeClient(SnakePost):
                             # If client is concerned, increment its size
                             if data_json[key] == self.nickname:
                                 self.me.grow(Constants.GROW)
-                                # self.snakes[data_json[key]].grow(Constants.GROW)
                         break
             except:
-                print "Exception client"
+                #print "Exception client"
                 pass
 
             # time tracking
             self.current_time += self.clock.tick(Constants.FPS)
 
-            # check if the snake is still alive
-            # if not self.me.alive:
-            #    self.me.alive = True
-            #    self.me.restart()
-
-            # check if game need more food
-            # if self.new_apple_timer.expired(self.current_time):
-            #    self.f.make()
-
             # check if we need to move our own snake's state
-            # if we do, send an update of our position to
-            # the server
+            # if we do, send an update of our position to the server
             if self.move_snake_timer.expired(self.current_time):
                 self.me.move()
-                s = "{\"body_p\":" + str(self.me.body) + " }"
                 s = self.me.netinfo()
-                print s
                 self.send(s, (self.ip, self.port), secure=False)
 
             # check if we need to blink the unready snakes (unready state)
             if self.blink_snake_timer.expired(self.current_time):
                 for snake in self.snakes:
                     self.snakes[snake].blink()
-
-                    # check if snake has eaten
-                    #if self.me.ready:
-                    #    if self.f.check(self.me.head):
-                    #        self.me.grow(Constants.GROW)
-                    #        self.scores.inc_score(self.nickname, 1)
 
             # cleanup background
             self.gamescreen.fill(Constants.COLOR_BG)
@@ -232,6 +217,6 @@ class SnakeClient(SnakePost):
 if __name__ == "__main__":
     SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "pasquier").run()
     #SnakeClient(Constants.IP_SERVER, 7777, "green", "pasquier").run()
-    # SnakeClient("127.0.0.1", Constants.PORT_SERVER, "green", "tinder_guy").run()
+    #SnakeClient("127.0.0.1", Constants.PORT_SERVER, "green", "tinder_guy").run()
     # SnakeClient("192.168.1.42", 21025, "red", "pasqueir").run()
     #SnakeClient("192.168.1.42", 21025, "yellow", "nyancat").run()
