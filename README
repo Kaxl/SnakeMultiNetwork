@@ -1,7 +1,7 @@
 Axel Fahy - Rudolf Hohn
 
 Mettre le bon couple (ip / port) dans le fichier 'constants.py'
-(Constants.IP_SERVER et Constants.PORT)
+(Constants.IP_SERVER et Constants.PORT_SERVER)
 
 Server
 ------
