@@ -62,7 +62,6 @@ class SnakeServer(SnakePost):
             if data is not None:
                 try:
                     data_json = json.loads(data)
-                    print data_json
                     for key in data_json:
                         if key == 'body_p':
                             # Update the position of the snake
@@ -78,7 +77,6 @@ class SnakeServer(SnakePost):
                                 if self.players[conn].positions[0] == pos:
                                     # Remove apple from the list
                                     self.foods.remove(pos)
-                                    self.players[conn].score += 1
                                     # Send "grow" message
                                     self.broadcast(self.create_msg("grow", self.players[conn].name), True)
                                     # Send list of foods
@@ -134,12 +132,11 @@ class SnakeServer(SnakePost):
 
                             # Send "players_info" message
                             self.broadcast(self.create_msg("players_info"), True)
-                            print "ready"
                         break
                     if self.players.get(conn):
                         self.players[conn].last_update = self.current_time
                 except:
-                    print "Exception server"
+                    #print "Exception server"
                     pass
 
             # Time tracking
@@ -202,7 +199,6 @@ class SnakeServer(SnakePost):
         :param secure: If secure or not
         :return:
         """
-        print "Sending : " + str(msg)
         for conn in self.players:
             self.send(msg, conn, secure)
 
