@@ -50,10 +50,6 @@ class SnakeClient(SnakePost):
         # score area rectangle surface
         self.scorescreen = pygame.Surface((self.score_width, Constants.RESOLUTION[1]))
 
-        # Snake and foods manager
-        # self.me = Snake(color=pygame.color.THECOLORS[self.preferences.get("color")], \
-        #                nickname=self.preferences.get("nickname"))
-
         self.me = Snake(color=pygame.color.THECOLORS[color],
                         nickname=nickname)
 
@@ -112,9 +108,7 @@ class SnakeClient(SnakePost):
             try:
                 data, conn = self.receive()
                 if data is not None:
-                    # print "[Client] Rcv : ", data
                     data_json = json.loads(data)
-                    # print data_json
                     for key in data_json:
                         if key == 'foods':
                             # Update the list of apples
@@ -214,7 +208,7 @@ class SnakeClient(SnakePost):
 
 
 if __name__ == "__main__":
-    SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "pasquier").run()
+    SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "pink", "axel").run()
     #SnakeClient(Constants.IP_SERVER, 7777, "green", "pasquier").run()
     #SnakeClient("127.0.0.1", Constants.PORT_SERVER, "green", "tinder_guy").run()
     # SnakeClient("192.168.1.42", 21025, "red", "pasqueir").run()

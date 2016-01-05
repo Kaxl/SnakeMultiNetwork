@@ -77,7 +77,6 @@ class SnakeServer(SnakePost):
                                 if self.players[conn].positions[0] == pos:
                                     # Remove apple from the list
                                     self.foods.remove(pos)
-                                    # Send "grow" message
                                     self.broadcast(self.create_msg("grow", self.players[conn].name), True)
                                     # Send list of foods
                                     self.broadcast(self.create_msg("foods"), True)
@@ -143,7 +142,7 @@ class SnakeServer(SnakePost):
             self.current_time += self.clock.tick(Constants.FPS)
 
             # Check if game need more food
-            if self.new_apple_timer.expired(self.current_time):
+            if self.new_apple_timer.expired(self.current_time) and len(self.foods) < Constants.MAX_APPLE_SAME_TIME:
                 self.foods.append([random.randint(0, Constants.UNITS - 1), random.randint(0, Constants.UNITS - 1)])
                 self.broadcast(self.create_msg("foods"), True)
 
