@@ -94,6 +94,43 @@ class SnakeClient(SnakePost):
     def run(self):
         self.running = True
         while self.running:
+            self.current_time += self.clock.tick(FPS)
+
+            # check if we need to move our own snake's state
+            # if we do, send an update of our position to the server
+            if self.move_snake_timer.expired(self.current_time):
+                self.me.move()
+                s = self.me.netinfo()
+                self.send(s, (self.ip, self.port), secure=False)
+
+            # check if we need to blink the unready snakes (unready state)
+            if self.blink_snake_timer.expired(self.current_time):
+                for snake in self.snakes:
+                    self.snakes[snake].blink()
+
+            # cleanup background
+            self.gamescreen.fill(Constants.COLOR_BG)
+
+            # draw scores
+            self.scores.draw(self.screen)
+
+            # draw all snakes positions as last seen by the server
+            # we do not compute their positions ourselves!
+            for snake in self.snakes:
+                self.snakes[snake].draw(self.gamescreen)
+
+            # draw food
+            self.f.draw(self.gamescreen)
+
+            # process external events (keyboard,...)
+            self.process_events()
+
+            # then update display
+            # update game area on screen container
+            self.screen.blit(self.gamescreen, (self.score_width, 0))
+
+            pygame.display.update()
+
             # Process message to send
             self.process_buffer()
 
@@ -161,40 +198,6 @@ class SnakeClient(SnakePost):
                 #print "Exception client"
                 pass
 
-            # check if we need to move our own snake's state
-            # if we do, send an update of our position to the server
-            if self.move_snake_timer.expired(self.current_time):
-                self.me.move()
-                s = self.me.netinfo()
-                self.send(s, (self.ip, self.port), secure=False)
-
-            # check if we need to blink the unready snakes (unready state)
-            if self.blink_snake_timer.expired(self.current_time):
-                for snake in self.snakes:
-                    self.snakes[snake].blink()
-
-            # cleanup background
-            self.gamescreen.fill(Constants.COLOR_BG)
-
-            # draw scores
-            self.scores.draw(self.screen)
-
-            # draw all snakes positions as last seen by the server
-            # we do not compute their positions ourselves!
-            for snake in self.snakes:
-                self.snakes[snake].draw(self.gamescreen)
-
-            # draw food
-            self.f.draw(self.gamescreen)
-
-            # process external events (keyboard,...)
-            self.process_events()
-
-            # then update display
-            # update game area on screen container
-            self.screen.blit(self.gamescreen, (self.score_width, 0))
-
-            pygame.display.update()
 
 
 if __name__ == "__main__":

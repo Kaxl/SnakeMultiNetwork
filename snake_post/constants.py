@@ -9,5 +9,5 @@ SEQ_OUTBAND = 0xffffffff    # Message for the connection
 
 SEND_INTERVAL = 300
 MAX_SIZE_LIST = 64
-ACK_INTERVAL = 30
+ACK_INTERVAL = 15
 FPS = 60
