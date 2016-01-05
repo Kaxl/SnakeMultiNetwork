@@ -176,6 +176,8 @@ class SnakeChannel(object):
                             state += 1
                     except ValueError:
                         state = 0
+                    except:
+                        state = 0
 
                 elif state == 3:
                     # 4. Wait for <<Connected B>>

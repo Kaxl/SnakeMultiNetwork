@@ -17,9 +17,9 @@ class Constants:
     # Info server
     #IP_SERVER = "127.0.0.1"
     #IP_SERVER = "129.194.186.177"
-    #PORT_SERVER = 8080
-    IP_SERVER = "192.168.1.4"
-    PORT_SERVER = 21025
+    PORT_SERVER = 8080
+    IP_SERVER = "192.168.1.2"
+    #PORT_SERVER = 21025
 
     # GAME NAME
     CAPTION = "Yet Another Python Snake - Multi-player"
