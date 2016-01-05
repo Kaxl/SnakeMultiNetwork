@@ -213,7 +213,6 @@ class SnakeChannel(object):
         :param connection: connection (ip, port)
         :param seq: sequence number if provided
         """
-        #print "[snake_channel] Sending : ", data
         if self.local_seq_number.get(connection) is None:
             self.local_seq_number[connection] = SEQ_OUTBAND
 

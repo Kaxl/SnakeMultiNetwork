@@ -28,7 +28,8 @@ class SnakePost(SnakeChannel):
         self.ack_received = {}
 
         # Timers
-        self.ack_timer = Timer(ACK_INTERVAL, 0, True)
+        self.ack_timer_dict = {}
+        #self.ack_timer = Timer(ACK_INTERVAL, 0, True)
 
         self.clock = pygame.time.Clock()
         self.current_time = 0
@@ -64,9 +65,11 @@ class SnakePost(SnakeChannel):
         if not self.last_seq_number.get(connection):
             self.last_seq_number[connection] = []
         if not self.ack_received.get(connection):
-            self.ack_received[connection] = None
+            self.ack_received[connection] = []
         if not self.secure_in_network.get(connection):
-            self.secure_in_network[connection] = None
+            self.secure_in_network[connection] = []
+        if not self.ack_timer_dict.get(connection):
+            self.ack_timer_dict[connection] = Timer(ACK_INTERVAL, 0, True)
 
     def is_connected(self, connection):
         """Check if client is connected
@@ -114,9 +117,8 @@ class SnakePost(SnakeChannel):
         self.current_time += self.clock.tick(FPS)
         for connection in self.connections:
             if self.secure_in_network.get(connection) and \
-                    self.secure_in_network[connection] and \
-                    not self.ack_received[connection] and \
-                    self.ack_timer.expired(self.current_time):
+                    not self.ack_received.get(connection) and \
+                    self.ack_timer_dict.get(connection).expired(self.current_time):
                 # RE-send SECURE
                 # If we didn't received ack for secure message, resend the message
                 data = self.buffer_secure[connection][0][0]
@@ -127,13 +129,12 @@ class SnakePost(SnakeChannel):
                     self.send_channel(data, connection)
 
             elif self.buffer_secure.get(connection) and \
-                    self.buffer_secure[connection] and \
-                    not self.secure_in_network[connection]:
+                    not self.secure_in_network.get(connection):
                 # Send SECURE
                 # Get the first secure packet to send
                 # We don't pop it because we will wait for the ack
                 data = self.buffer_secure[connection][0][0]
-                if not self.secure_in_network[connection]:
+                if not self.secure_in_network.get(connection):
                     # We are sending a secure message, we need to receive a ack and
                     # we can't have two secure message at the same time on the same channel
                     self.ack_received[connection] = False
@@ -145,13 +146,12 @@ class SnakePost(SnakeChannel):
                         self.send_channel(data, connection)
 
                     # Activate the timer in order to resend the message if it expires
-                    self.ack_timer.activate(0)
+                    self.ack_timer_dict[connection].activate(0)
 
             else:
                 # Send NORMAL
-                if self.buffer_normal.get(connection) and \
-                        self.buffer_normal[connection]:
-                    data = self.buffer_normal[connection].pop(0)[0]
+                if self.buffer_normal.get(connection):
+                    data = self.buffer_normal.get(connection).pop(0)[0]
 
                     if self.udp:  # on udp
                         self.channel.sendto(data, connection)
@@ -168,15 +168,14 @@ class SnakePost(SnakeChannel):
         pack = struct.pack('>2H', 0, seq_number)
         # When sending the ack, send data with the ack, if any
         if self.buffer_secure.get(connection) and \
-                self.buffer_secure[connection] and \
-                not self.secure_in_network[connection]:
+                not self.secure_in_network.get(connection):
             # Secure message
             # Set a random seq_number
             pack = struct.pack('>2H', self.last_seq_number[connection][0], seq_number)
             pack += self.buffer_secure[connection][0][0]
             self.secure_in_network[connection] = True
             self.ack_received[connection] = False
-        if self.buffer_normal.get(connection) and self.buffer_normal[connection]:
+        if self.buffer_normal.get(connection):
             # Normal message
             pack += self.buffer_normal[connection].pop(0)[0]
 
