@@ -74,4 +74,6 @@ doc/rapport/*.aux
 doc/rapport/*.gz
 doc/rapport/*.pdf
 
+doc/*.mp4
+
 
