@@ -1,6 +1,6 @@
 Axel Fahy - Rudolf Hohn
 
-Mettre le bon couple (ip / port) dans le fichier 'constants.py'
+Mettre le bon couple (ip / port) dans le fichier 'constants.py' du dossier principal (SnakeMultiNetwork)
 (Constants.IP_SERVER et Constants.PORT_SERVER)
 
 Server
