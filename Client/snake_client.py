@@ -23,7 +23,6 @@ class SnakeClient(SnakePost):
 
         pygame.init()
         self.clock = pygame.time.Clock()
-        self.current_time = 0
         self.connect()
         print "Connected"
 
@@ -61,16 +60,12 @@ class SnakeClient(SnakePost):
         # Score manager
         self.scores = Scores((self.score_width, Constants.RESOLUTION[1]))
 
-        # add our own score, the server will send us the remaining one at connection
-        # self.scores.new_score(self.preferences.get("nickname"), \
-        #                      pygame.color.THECOLORS[self.preferences.get("color")])
-
         # game area background color
         self.gamescreen.fill(Constants.COLOR_BG)
         self.scorescreen.fill((100, 100, 100))
 
         # timers
-        self.clock = pygame.time.Clock()
+        #self.clock = pygame.time.Clock()
         self.current_time = 0
 
         self.move_snake_timer = Timer(1.0 / Constants.SNAKE_SPEED * 1000, self.current_time, periodic=True)
@@ -203,4 +198,4 @@ class SnakeClient(SnakePost):
 
 
 if __name__ == "__main__":
-    SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "axel").run()
+    SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "red", "john").run()

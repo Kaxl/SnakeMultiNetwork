@@ -211,8 +211,8 @@ class SnakePost(SnakeChannel):
                     self.last_seq_number[conn].pop(0)
                     self.secure_in_network[conn] = False
                     self.ack_received[conn] = True
-                    #if seq_number != 0:
-                    #    self.ack(seq_number, conn)
+                    if seq_number != 0:
+                        self.ack(seq_number, conn)
                 else:
                     if self.udp:  # on udp
                         self.channel.sendto(self.buffer_secure[conn][0][0], conn)
