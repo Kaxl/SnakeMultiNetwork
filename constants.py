@@ -15,11 +15,11 @@ class Constants:
     D_READY = 2
 
     # Info server
-    IP_SERVER = "129.194.186.177"
-    PORT_SERVER = 8080
-    #IP_SERVER = "192.168.1.4"
     #IP_SERVER = "127.0.0.1"
-    #PORT_SERVER = 21025
+    #IP_SERVER = "129.194.186.177"
+    #PORT_SERVER = 8080
+    IP_SERVER = "192.168.1.4"
+    PORT_SERVER = 21025
 
     # GAME NAME
     CAPTION = "Yet Another Python Snake - Multi-player"

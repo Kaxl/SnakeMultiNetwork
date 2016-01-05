@@ -22,7 +22,6 @@ class SnakeClient(SnakePost):
         self.port = int(port)  # Port of client
 
         pygame.init()
-        self.clock = pygame.time.Clock()
         self.connect()
         print "Connected"
 
@@ -65,13 +64,13 @@ class SnakeClient(SnakePost):
         self.scorescreen.fill((100, 100, 100))
 
         # timers
-        #self.clock = pygame.time.Clock()
-        self.current_time = 0
+        self.clock_local = pygame.time.Clock()
+        self.current_time_local = 0
 
-        self.move_snake_timer = Timer(1.0 / Constants.SNAKE_SPEED * 1000, self.current_time, periodic=True)
-        self.blink_snake_timer = Timer(1.0 / Constants.SNAKE_BLINKING_SPEED * 1000, self.current_time, periodic=True)
-        self.blink_banner_timer = Timer(500, self.current_time, periodic=True)
-        self.new_apple_timer = Timer(Constants.NEW_APPLE_PERIOD * 1000, self.current_time, periodic=True)
+        self.move_snake_timer = Timer(1.0 / Constants.SNAKE_SPEED * 1000, self.current_time_local, periodic=True)
+        self.blink_snake_timer = Timer(1.0 / Constants.SNAKE_BLINKING_SPEED * 1000, self.current_time_local, periodic=True)
+        self.blink_banner_timer = Timer(500, self.current_time_local, periodic=True)
+        self.new_apple_timer = Timer(Constants.NEW_APPLE_PERIOD * 1000, self.current_time_local, periodic=True)
 
     def process_events(self):
         # key handling
@@ -94,17 +93,17 @@ class SnakeClient(SnakePost):
     def run(self):
         self.running = True
         while self.running:
-            self.current_time += self.clock.tick(FPS)
+            self.current_time_local += self.clock_local.tick(FPS)
 
             # check if we need to move our own snake's state
             # if we do, send an update of our position to the server
-            if self.move_snake_timer.expired(self.current_time):
+            if self.move_snake_timer.expired(self.current_time_local):
                 self.me.move()
                 s = self.me.netinfo()
                 self.send(s, (self.ip, self.port), secure=False)
 
             # check if we need to blink the unready snakes (unready state)
-            if self.blink_snake_timer.expired(self.current_time):
+            if self.blink_snake_timer.expired(self.current_time_local):
                 for snake in self.snakes:
                     self.snakes[snake].blink()
 
