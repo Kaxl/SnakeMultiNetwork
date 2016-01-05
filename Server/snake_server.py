@@ -17,7 +17,6 @@ class SnakeServer(SnakePost):
                                           Constants.PORT_SERVER)
         pygame.init()
         self.clock = pygame.time.Clock()
-        self.current_time = 0
 
         self.ip = Constants.IP_SERVER
         self.port = Constants.PORT_SERVER
@@ -33,7 +32,6 @@ class SnakeServer(SnakePost):
 
         # timers
         self.clock = pygame.time.Clock()
-        self.current_time = 0
 
         self.new_apple_timer = Timer(Constants.NEW_APPLE_PERIOD * 1000, self.current_time, periodic=True)
         self.send_snakes_timer = Timer(Constants.SNAKES_PERIOD * 1000, self.current_time, periodic=True)
@@ -79,6 +77,7 @@ class SnakeServer(SnakePost):
                                     self.broadcast(self.create_msg("grow", self.players[conn].name), True)
                                     # Send list of foods
                                     self.broadcast(self.create_msg("foods"), True)
+                                    break
 
                             # Check for collisions
                             # Loop over each players
@@ -134,9 +133,6 @@ class SnakeServer(SnakePost):
                 except:
                     #print "Exception server"
                     pass
-
-            # Time tracking
-            self.current_time += self.clock.tick(Constants.FPS)
 
             # Check if game need more food
             if self.new_apple_timer.expired(self.current_time) and len(self.foods) < Constants.MAX_APPLE_SAME_TIME:

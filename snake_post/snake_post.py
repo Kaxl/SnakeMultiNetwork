@@ -29,7 +29,6 @@ class SnakePost(SnakeChannel):
 
         # Timers
         self.ack_timer_dict = {}
-        #self.ack_timer = Timer(ACK_INTERVAL, 0, True)
 
         self.clock = pygame.time.Clock()
         self.current_time = 0
@@ -58,6 +57,8 @@ class SnakePost(SnakeChannel):
         """
         if not self.buffer_normal.get(connection):
             self.buffer_normal[connection] = []
+        else:
+            return
         if not self.buffer_secure.get(connection):
             self.buffer_secure[connection] = []
         if not self.last_ack.get(connection):
@@ -95,8 +96,10 @@ class SnakePost(SnakeChannel):
         """
         self.init_dict(connection)
         if not secure:
+            print "append normal"
             self.buffer_normal[connection].append((struct.pack('>2H', 0, 0) + data, connection))
         else:
+            print "append secure -------------------"
             if len(self.buffer_secure[connection]) < MAX_SIZE_LIST:
                 self.last_seq_number[connection].append(random.randint(1, (1 << 16) - 1))
                 self.buffer_secure[connection].append(
@@ -122,6 +125,7 @@ class SnakePost(SnakeChannel):
                 # RE-send SECURE
                 # If we didn't received ack for secure message, resend the message
                 data = self.buffer_secure[connection][0][0]
+                print 'RESEND RESEND RESEND RESEND *****************************'
 
                 if self.udp:  # on udp
                     self.channel.sendto(data, connection)
@@ -134,20 +138,19 @@ class SnakePost(SnakeChannel):
                 # Get the first secure packet to send
                 # We don't pop it because we will wait for the ack
                 data = self.buffer_secure[connection][0][0]
-                if not self.secure_in_network.get(connection):
-                    # We are sending a secure message, we need to receive a ack and
-                    # we can't have two secure message at the same time on the same channel
-                    self.ack_received[connection] = False
-                    self.secure_in_network[connection] = True
 
-                    if self.udp:  # on udp
-                        self.channel.sendto(data, connection)
-                    else:  # on snake_channel
-                        self.send_channel(data, connection)
+                # We are sending a secure message, we need to receive a ack and
+                # we can't have two secure message at the same time on the same channel
+                self.ack_received[connection] = False
+                self.secure_in_network[connection] = True
 
-                    # Activate the timer in order to resend the message if it expires
-                    self.ack_timer_dict[connection].activate(0)
+                if self.udp:  # on udp
+                    self.channel.sendto(data, connection)
+                else:  # on snake_channel
+                    self.send_channel(data, connection)
 
+                # Activate the timer in order to resend the message if it expires
+                self.ack_timer_dict[connection].activate(self.current_time)
             else:
                 # Send NORMAL
                 if self.buffer_normal.get(connection):
@@ -175,7 +178,7 @@ class SnakePost(SnakeChannel):
             pack += self.buffer_secure[connection][0][0]
             self.secure_in_network[connection] = True
             self.ack_received[connection] = False
-        if self.buffer_normal.get(connection):
+        elif self.buffer_normal.get(connection):
             # Normal message
             pack += self.buffer_normal[connection].pop(0)[0]
 
@@ -204,16 +207,16 @@ class SnakePost(SnakeChannel):
 
             # If we receive an ack
             if ack_number != 0 and len(self.last_seq_number[conn]) > 0:
-                # and (seq_number == 0 or seq_number == self.last_seq_number[conn][0]):
                 # Compare the ack_number with the last seq_number
                 if ack_number == self.last_seq_number[conn][0]:
                     # If the ack is correct, remove the secure message from the list
+                    print 'ACK RECEIVED'
                     self.buffer_secure[conn].pop(0)
                     self.last_seq_number[conn].pop(0)
                     self.secure_in_network[conn] = False
                     self.ack_received[conn] = True
-                    if seq_number != 0:
-                        self.ack(seq_number, conn)
+                    #if seq_number != 0:
+                    #    self.ack(seq_number, conn)
                 else:
                     if self.udp:  # on udp
                         self.channel.sendto(self.buffer_secure[conn][0][0], conn)

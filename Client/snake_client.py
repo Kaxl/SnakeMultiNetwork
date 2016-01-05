@@ -167,7 +167,7 @@ class SnakeClient(SnakePost):
                 pass
 
             # time tracking
-            self.current_time += self.clock.tick(Constants.FPS)
+            # self.current_time += self.clock.tick(Constants.FPS)
 
             # check if we need to move our own snake's state
             # if we do, send an update of our position to the server
