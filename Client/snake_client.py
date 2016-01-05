@@ -26,6 +26,7 @@ class SnakeClient(SnakePost):
         self.current_time = 0
         self.connect()
         print "Connected"
+        # SEND_INTERVAL from snake_post constants
         self.send_timer = Timer(SEND_INTERVAL, 0, True)
 
         # get preferences
@@ -100,7 +101,6 @@ class SnakeClient(SnakePost):
     def run(self):
         self.running = True
         while self.running:
-
             # Process message to send
             self.process_buffer()
 
@@ -208,7 +208,7 @@ class SnakeClient(SnakePost):
 
 
 if __name__ == "__main__":
-    SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "pink", "axel").run()
+    SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "axel").run()
     #SnakeClient(Constants.IP_SERVER, 7777, "green", "pasquier").run()
     #SnakeClient("127.0.0.1", Constants.PORT_SERVER, "green", "tinder_guy").run()
     # SnakeClient("192.168.1.42", 21025, "red", "pasqueir").run()
