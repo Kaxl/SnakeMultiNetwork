@@ -16,7 +16,6 @@ class SnakeServer(SnakePost):
         super(SnakeServer, self).__init__(socket.socket(socket.AF_INET, socket.SOCK_DGRAM), Constants.IP_SERVER,
                                           Constants.PORT_SERVER)
         pygame.init()
-        self.clock = pygame.time.Clock()
 
         self.ip = Constants.IP_SERVER
         self.port = Constants.PORT_SERVER
@@ -30,16 +29,13 @@ class SnakeServer(SnakePost):
         # List of foods
         self.foods = []
 
-        #self.current_time = 0
-
         self.new_apple_timer = Timer(Constants.NEW_APPLE_PERIOD * 1000, self.current_time, periodic=True)
         self.send_snakes_timer = Timer(Constants.SNAKES_PERIOD * 1000, self.current_time, periodic=True)
         self.check_activity_timer = Timer(Constants.ACTIVITY_PERIOD * 1000, self.current_time, periodic=True)
-        print "Server initialized"
+        print "Server initialized on " + str(self.ip) + " / " + str(self.port)
 
     def run(self):
         while True:
-            #self.current_time += self.clock.tick(FPS)
             # Process message to send
             self.process_buffer()
 
@@ -90,7 +86,8 @@ class SnakeServer(SnakePost):
                                     if p == conn:
                                         if self.players[conn].positions.count(self.players[conn].positions[0]) > 1:
                                             # Send "game over"
-                                            self.broadcast(self.create_msg("game_over", self.players[conn].name))
+                                            self.broadcast(self.create_msg("game_over", self.players[conn].name), True)
+
                                             # Decrement score of player
                                             self.players[conn].score -= 1
 
@@ -98,7 +95,7 @@ class SnakeServer(SnakePost):
                                             self.players[conn].ready = False
 
                                             # Resend a players_info to change the score
-                                            self.broadcast(self.create_msg("players_info"))
+                                            self.broadcast(self.create_msg("players_info"), True)
                                             break
                                     else:
                                         # If a position of player is the same as the new head
@@ -108,16 +105,15 @@ class SnakeServer(SnakePost):
 
                                             # If the player was "hit" by another player he wins 1 point
                                             if p != conn:
+                                                # Decrement score of players
                                                 self.players[p].score += 1
-                                            else:
-                                                # Decrement score of player
                                                 self.players[conn].score -= 1
 
                                             # Change state of player to not ready
                                             self.players[conn].ready = False
 
                                             # Resend a players_info to change the score
-                                            self.broadcast(self.create_msg("players_info"))
+                                            self.broadcast(self.create_msg("players_info"), True)
                                             break
 
                         elif key == 'ready':
