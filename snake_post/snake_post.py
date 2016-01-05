@@ -96,10 +96,8 @@ class SnakePost(SnakeChannel):
         """
         self.init_dict(connection)
         if not secure:
-            print "append normal"
             self.buffer_normal[connection].append((struct.pack('>2H', 0, 0) + data, connection))
         else:
-            print "append secure -------------------"
             if len(self.buffer_secure[connection]) < MAX_SIZE_LIST:
                 self.last_seq_number[connection].append(random.randint(1, (1 << 16) - 1))
                 self.buffer_secure[connection].append(
@@ -125,7 +123,6 @@ class SnakePost(SnakeChannel):
                 # RE-send SECURE
                 # If we didn't received ack for secure message, resend the message
                 data = self.buffer_secure[connection][0][0]
-                print 'RESEND RESEND RESEND RESEND *****************************'
 
                 if self.udp:  # on udp
                     self.channel.sendto(data, connection)
@@ -210,7 +207,6 @@ class SnakePost(SnakeChannel):
                 # Compare the ack_number with the last seq_number
                 if ack_number == self.last_seq_number[conn][0]:
                     # If the ack is correct, remove the secure message from the list
-                    print 'ACK RECEIVED'
                     self.buffer_secure[conn].pop(0)
                     self.last_seq_number[conn].pop(0)
                     self.secure_in_network[conn] = False

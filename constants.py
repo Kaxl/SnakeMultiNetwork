@@ -15,14 +15,14 @@ class Constants:
     D_READY = 2
 
     # Info server
-    #IP_SERVER = "129.194.186.177"
-    #PORT_SERVER = 8080
-    IP_SERVER = "192.168.1.4"
+    IP_SERVER = "129.194.186.177"
+    PORT_SERVER = 7777
+    #IP_SERVER = "192.168.1.4"
     #IP_SERVER = "127.0.0.1"
-    PORT_SERVER = 21025
+    #PORT_SERVER = 21025
 
     # GAME NAME
-    CAPTION = "Yet Another Python Snake - Single-player"
+    CAPTION = "Yet Another Python Snake - Multi-player"
     UNITS = 40
     RESOLUTION = (500,500)
 

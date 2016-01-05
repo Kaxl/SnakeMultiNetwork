@@ -227,7 +227,6 @@ class SnakeChannel(object):
         pack += data
 
         # Send the message
-        #print str(pack)
         self.channel.sendto(pack, connection)
 
     def receive_channel(self):

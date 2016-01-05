@@ -166,9 +166,6 @@ class SnakeClient(SnakePost):
                 #print "Exception client"
                 pass
 
-            # time tracking
-            # self.current_time += self.clock.tick(Constants.FPS)
-
             # check if we need to move our own snake's state
             # if we do, send an update of our position to the server
             if self.move_snake_timer.expired(self.current_time):
@@ -207,7 +204,3 @@ class SnakeClient(SnakePost):
 
 if __name__ == "__main__":
     SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "green", "axel").run()
-    #SnakeClient(Constants.IP_SERVER, 7777, "green", "pasquier").run()
-    #SnakeClient("127.0.0.1", Constants.PORT_SERVER, "green", "tinder_guy").run()
-    # SnakeClient("192.168.1.42", 21025, "red", "pasqueir").run()
-    #SnakeClient("192.168.1.42", 21025, "yellow", "nyancat").run()
