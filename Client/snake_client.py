@@ -26,8 +26,6 @@ class SnakeClient(SnakePost):
         self.current_time = 0
         self.connect()
         print "Connected"
-        # SEND_INTERVAL from snake_post constants
-        self.send_timer = Timer(SEND_INTERVAL, 0, True)
 
         # get preferences
         self.preferences = Preferences()

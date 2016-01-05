@@ -15,12 +15,11 @@ class Constants:
     D_READY = 2
 
     # Info server
-    #IP_SERVER = "129.194.186.177"
-    #IP_SERVER = "192.168.1.2"
-    IP_SERVER = "127.0.0.1"
+    IP_SERVER = "129.194.186.177"
     PORT_SERVER = 8080
-
-    SEND_INTERVAL = 30
+    #IP_SERVER = "192.168.1.4"
+    #IP_SERVER = "127.0.0.1"
+    #PORT_SERVER = 21025
 
     # GAME NAME
     CAPTION = "Yet Another Python Snake - Single-player"
@@ -44,7 +43,6 @@ class Constants:
     COLOR_BG = (0,0,0)
 
     START_LENGTH = 5
-    ACK_INTERVAL = 30
 
     SNAKES_PERIOD = 0.1
     ACTIVITY_PERIOD = 2

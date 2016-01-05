@@ -18,7 +18,6 @@ class SnakeServer(SnakePost):
         pygame.init()
         self.clock = pygame.time.Clock()
         self.current_time = 0
-        self.send_timer = Timer(SEND_INTERVAL, 0, True)
 
         self.ip = Constants.IP_SERVER
         self.port = Constants.PORT_SERVER
@@ -80,8 +79,6 @@ class SnakeServer(SnakePost):
                                     self.broadcast(self.create_msg("grow", self.players[conn].name), True)
                                     # Send list of foods
                                     self.broadcast(self.create_msg("foods"), True)
-                                    # Resend a players_info to change the score
-                                    self.broadcast(self.create_msg("players_info"))
 
                             # Check for collisions
                             # Loop over each players
