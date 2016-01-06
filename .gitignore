@@ -73,5 +73,9 @@ doc/rapport/*.log
 doc/rapport/*.aux
 doc/rapport/*.gz
 doc/rapport/*.pdf
+doc/rapport/*.fls
+doc/rapport/*.fdb_latexmk
+
+doc/*.mp4
 
 

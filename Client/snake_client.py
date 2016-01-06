@@ -174,6 +174,8 @@ class SnakeClient(SnakePost):
                                     # Set ready
                                     if player_info[3]:
                                         self.snakes[player_info[0]].set_ready()
+                                    else:
+                                        self.snakes[player_info[0]].set_unready()
                                     # Set the scores
                                     self.scores.set_score(player_info[0], player_info[2])
 
@@ -182,11 +184,9 @@ class SnakeClient(SnakePost):
                             if data_json[key] == self.nickname:
                                 self.snakes[data_json[key]].restart()
                                 self.me.restart()
-                                self.snakes[data_json[key]].ready = False
-                                self.me.ready()
 
                             # Set the player who had game over at not ready
-                            self.snakes[data_json[key]].ready = False
+                            self.snakes[data_json[key]].set_unready()
 
                         elif key == 'grow':
                             # If client is concerned, increment its size
