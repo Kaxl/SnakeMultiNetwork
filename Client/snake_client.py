@@ -183,7 +183,7 @@ class SnakeClient(SnakePost):
                                 self.snakes[data_json[key]].restart()
                                 self.me.restart()
                                 self.snakes[data_json[key]].ready = False
-                                self.me.ready()
+                                self.me.ready = False
 
                             # Set the player who had game over at not ready
                             self.snakes[data_json[key]].ready = False
