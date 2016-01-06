@@ -200,4 +200,4 @@ class SnakeClient(SnakePost):
 
 
 if __name__ == "__main__":
-    SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "red", "john").run()
+    SnakeClient(Constants.IP_SERVER, Constants.PORT_SERVER, "white", "walter").run()
