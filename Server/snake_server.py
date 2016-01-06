@@ -82,7 +82,7 @@ class SnakeServer(SnakePost):
                                     continue
                                 # Loop over each position of player
                                 for pos in self.players[p].positions:
-                                    # If we check the current player, check if a position if present two times
+                                    # If we check the current player, check if a position is present two times
                                     if p == conn:
                                         if self.players[conn].positions.count(self.players[conn].positions[0]) > 1:
                                             # Send "game over"
